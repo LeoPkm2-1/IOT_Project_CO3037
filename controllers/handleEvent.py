@@ -24,8 +24,7 @@ class HandleEvent:
                                                              'ADD_SCHEDULE',
                                                              'schedule ok',
                                                              eventData['payload']))
-                        # for id,task in enumerate(LIST_OF_TASK):
-                        #     print(id,task)
+
                     # xoá lịch
                     elif eventData['command'].upper()=='REMOVE_SCHEDULE':
                         pass
