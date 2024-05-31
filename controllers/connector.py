@@ -1,11 +1,13 @@
 
 import os
 import sys
+import json
 from Adafruit_IO import MQTTClient
 from dotenv import load_dotenv
 
 load_dotenv()
-
+LISTEN_IOT_GATE=os.getenv('LISTEN_IOT_GATE')
+RESPONSE_IOT_GATE=os.getenv('RESPONSE_IOT_GATE')
 
 class ADAFRUIT_CONNECTOR:
     # static variable
@@ -14,8 +16,8 @@ class ADAFRUIT_CONNECTOR:
                     'cambien3',
                     'nutnhan1', 
                     'nutnhan2',
-                    'response-gate',
-                    'submit-gate']
+                    LISTEN_IOT_GATE,
+                    RESPONSE_IOT_GATE]
     AIO_USERNAME = os.getenv('ADAFRUIT_IO_USERNAME')
     AIO_KEY = os.getenv('ADAFRUIT_IO_PASSWORD')
 
@@ -115,4 +117,5 @@ class ADAFRUIT_CONNECTOR:
     # send data
     def sendData(self, target_feed_id, data=''):
         self.client.publish(target_feed_id, data)
+
 
