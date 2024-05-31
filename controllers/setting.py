@@ -65,8 +65,10 @@ class Schedule:
         self.flow1 = float(flow1) if Utilization.is_valid_number(flow1) else 0
         self.flow2 = float(flow2) if Utilization.is_valid_number(flow2) else 0
         self.flow3 = float(flow3) if Utilization.is_valid_number(flow3) else 0
-        if self.scheduleStartTime < datetime.datetime.now():
-            raise Exception("START_TIME_IN_PASS")
+
+
+        # if self.scheduleStartTime < datetime.datetime.now():
+        #     raise Exception("START_TIME_IN_PASS")
 
             
 
