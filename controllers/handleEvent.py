@@ -1,8 +1,12 @@
 from .setting import HandleSchedule,Task,Schedule,LIST_OF_TASK,LIST_OF_SCHEDULES
 from .setting import Utilization
 from .connector import ADAFRUIT_CONNECTOR,RESPONSE_IOT_GATE,LISTEN_IOT_GATE
+from  .sche import SCH_Add_Task,SCH_Delete_Task_Name
 import datetime
 import json
+import _thread
+import time 
+import threading
 class HandleEvent:
     @staticmethod
     def default_message_cb(connectorObj:ADAFRUIT_CONNECTOR):
@@ -24,7 +28,27 @@ class HandleEvent:
                                                              'ADD_SCHEDULE',
                                                              'schedule ok',
                                                              eventData['payload']))
-
+                        def acb(thread_name,deylay1):
+                            print('\tRun mix 1')
+                            def mix2():
+                                print("\t\tend mix 1")
+                                return
+                            threading.Timer(deylay1,mix2).start()
+                        def task_temp(thread_name,delay1,delay2):
+                            print('\t===RUN MIX 2')
+                            def mix():
+                                print('\t===END_M2')
+                                def func():
+                                    print('\t===ahihi')
+                                    return;
+                                threading.Timer(delay2,func).start()
+                            threading.Timer(delay1,mix).start()
+                        def delete_task_by_name(thread_name,task_name):
+                            SCH_Delete_Task_Name(task_name)
+                            return
+                        SCH_Add_Task(acb,'task_name_1',2,"thread_name_1",3)
+                        SCH_Add_Task(task_temp,"task_name_2",2,'thread_name_2',2,2)
+                        SCH_Add_Task(delete_task_by_name,'dell_ahihi',3,'thread_name_3',"task_name_1")
                     # xoá lịch
                     elif eventData['command'].upper()=='REMOVE_SCHEDULE':
                         pass
