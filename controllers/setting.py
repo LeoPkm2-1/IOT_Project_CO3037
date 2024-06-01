@@ -2,13 +2,16 @@ import datetime
 import math
 import json
 from datetime import timedelta
-WATER_FOR_U_MIXER_1 = 20
-WATER_FOR_U_MIXER_2 = 10
-WATER_FOR_U_MIXER_3 = 5
+WATER_FOR_U_MIXER_1 = 1
+WATER_FOR_U_MIXER_2 = 1
+WATER_FOR_U_MIXER_3 = 2
 WATER_SPEED = 9
 DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 LIST_OF_TASK =[]
 LIST_OF_SCHEDULES =[]
+WAITING_STATUS_TASK='WAITING'
+DONE_STATUS_TASK='DONE'
+RUNNING_STATUS_TASK='RUNNING'
 
 
 
@@ -81,18 +84,30 @@ class Schedule:
 
     def get_water_for_mix1(self):
         return self.flow1*WATER_FOR_U_MIXER_1
+    
+    def get_time_for_mix1(self):
+        return math.ceil(self.get_water_for_mix1()/WATER_SPEED)
 
     def get_water_for_mix2(self):
         return self.flow2*WATER_FOR_U_MIXER_2
+    
+    def get_time_for_mix2(self):
+        return math.ceil(self.get_water_for_mix2()/WATER_SPEED)
 
     def get_water_for_mix3(self):
         return self.flow3*WATER_FOR_U_MIXER_3
+    
+    def get_time_for_mix3(self):
+        return math.ceil(self.get_water_for_mix3()/WATER_SPEED)
 
     def get_total_water(self):
         return self.get_water_for_mix1()+self.get_water_for_mix2()+self.get_water_for_mix3()
 
     def get_time_for_mix(self):
-        return self.get_total_water()/WATER_SPEED
+        return self.get_time_for_mix1() \
+                +self.get_time_for_mix2() \
+                +self.get_time_for_mix3()
+        # return self.get_total_water()/WATER_SPEED
 
     def get_time_pump_out(self):
         return self.get_time_for_mix()
@@ -128,6 +143,7 @@ class Task (Schedule):
         self.startAt = startAt
         self.endAt = endAt
         self.taskId=taskId
+        self.presentStatus = WAITING_STATUS_TASK
 
         # self.endAt = self.scheduleStartTime + datetime.timedelta(seconds=self.get_time_task_taking())
     
@@ -157,8 +173,38 @@ class Task (Schedule):
     def get_taskId(self):
         return self.taskId
     
+    def set_status(self,status=WAITING_STATUS_TASK):
+        status=status.upper()
+        if status !=WAITING_STATUS_TASK \
+                and status!=RUNNING_STATUS_TASK \
+                and status != DONE_STATUS_TASK:
+            raise Exception('TASK_STATUS_NOT_TRUE')
+        
+        self.presentStatus=status
+    
+    def switch_status_running(self):
+        self.presentStatus = RUNNING_STATUS_TASK
+    
+    def switch_status_done(self):
+        self.presentStatus =DONE_STATUS_TASK
+    
+    def switch_status_waiting(self):
+        self.presentStatus = WAITING_STATUS_TASK
+    
+    def get_status(self):
+        return self.presentStatus
+    
     def set_taskId(self,taskId):
         self.taskId=taskId
+    
+    def isWaiting(self):
+        return self.get_status() == WAITING_STATUS_TASK
+    
+    def isRunning(self):
+        return self.get_status() == RUNNING_STATUS_TASK
+    
+    def isDone(self):
+        return self.get_status() == DONE_STATUS_TASK
         
     def update_times_with_known_startTime(self, startTime):
         self.set_startAt(startTime)
@@ -201,7 +247,6 @@ class HandleSchedule:
                 for startTime in listOfStartTimes
         ]
         nowString = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S_%f")
-        # print(nowString)
         for order,task in enumerate(listOfTask):
             task.set_taskId(
                 f"{order}_{self.schedule.scheduleId}_{nowString}"

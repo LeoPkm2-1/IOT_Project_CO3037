@@ -1,4 +1,4 @@
-import sche
+import sche_V3
 import time
 import threading
 
@@ -8,7 +8,7 @@ import threading
 
 
 count = 0
-sche.SCH_Init() # khởi tạo scheduler
+sche_V3.SCH_Init() # khởi tạo scheduler
 
 # =========================== define task ==================
 def tron(thread_name,mix_1_delay,pump_out_delay):
@@ -27,14 +27,14 @@ def tron(thread_name,mix_1_delay,pump_out_delay):
     
 
 # ======================== add start there====================
-sche.SCH_Add_Task(tron,2,"xin chao",1,3)
+sche_V3.SCH_Add_Task(tron,"tron", 5, "ThreadTron", 2, 3)
 
 # =============== Main zone======================================
 
 while True:
     print("count: ",count)
-    sche.SCH_Dispatch_Tasks()
-    sche.SCH_Update()
+    sche_V3.SCH_Dispatch_Tasks()
+    sche_V3.SCH_Update()
     count+=1
     time.sleep(1)
     
