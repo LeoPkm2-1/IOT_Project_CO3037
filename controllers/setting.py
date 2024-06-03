@@ -34,9 +34,10 @@ class Utilization:
         except ValueError:
             return False
     @staticmethod
-    def gen_response_message(status:str,command:str,msg,payload):
+    def gen_response_message(status:str,command_id:str,command:str,msg,payload):
         resMsg = {
             "status":status,
+            "commandId":command_id,
             "command":command,
             "message":msg,
             "payload":payload
@@ -61,7 +62,7 @@ class Schedule:
         self.cycle = int(cycle) if cycle.strip() else ''
         self.cycleType = str(cycleType).strip().upper()
         self.scheduleStartTime = datetime.datetime.strptime(
-            scheduleStartTime, self.DATE_TIME_FORMAT)
+            scheduleStartTime, self.DATE_TIME_FORMAT) if scheduleStartTime.upper() !='NOW' else datetime.datetime.now().strftime(self.DATE_TIME_FORMAT)
         self.scheduleEndTime = datetime.datetime.strptime(
             scheduleEndTime, self.DATE_TIME_FORMAT
         ) if Utilization.is_valid_date_time(str(scheduleEndTime)) else ''

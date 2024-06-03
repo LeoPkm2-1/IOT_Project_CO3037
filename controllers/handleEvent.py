@@ -71,6 +71,7 @@ class HandleEvent:
                     eventData = json.loads(payload)
                     # Thêm lịch 
                     if eventData['command'].upper()=='ADD_SCHEDULE':
+                        print('eventData======',eventData)
                         schedule=Schedule(**eventData['payload'])
                         if schedule.scheduleStartTime < datetime.datetime.now():
                             raise Exception("START_TIME_IN_PASS")
@@ -80,6 +81,7 @@ class HandleEvent:
                         LIST_OF_TASK.extend(listOfTasks)
                         connectorObj.sendData(RESPONSE_IOT_GATE,
                             Utilization.gen_response_message('SUCCESS',
+                                                             eventData['commandId'],
                                                              'ADD_SCHEDULE',
                                                              'schedule ok',
                                                              eventData['payload']))
@@ -127,12 +129,14 @@ class HandleEvent:
                 if error_message =='START_TIME_IN_PASS':
                     connectorObj.sendData(RESPONSE_IOT_GATE,
                         Utilization.gen_response_message("ERROR",
+                                                         eventData['commandId'],
                                                          'ADD_SCHEDULE',
                                                          'start time of schedule in pass',
                                                          eventData['payload']))
                 elif error_message =='END_TIME_AND_START_TIME_NOT_TRUE':
                     connectorObj.sendData(RESPONSE_IOT_GATE,
                         Utilization.gen_response_message("ERROR",
+                                                         eventData['commandId'],
                                                          'ADD_SCHEDULE',
                                                          'start time and end time not true',
                                                          eventData['payload']))                    
