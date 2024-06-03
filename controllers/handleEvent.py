@@ -71,7 +71,6 @@ class HandleEvent:
                     eventData = json.loads(payload)
                     # Thêm lịch 
                     if eventData['command'].upper()=='ADD_SCHEDULE':
-                        print('eventData======',eventData)
                         schedule=Schedule(**eventData['payload'])
                         if schedule.scheduleStartTime < datetime.datetime.now():
                             raise Exception("START_TIME_IN_PASS")
@@ -85,6 +84,8 @@ class HandleEvent:
                                                              'ADD_SCHEDULE',
                                                              'schedule ok',
                                                              eventData['payload']))
+                        for task in LIST_OF_TASK:
+                            print(task.taskId)
                         for task in listOfTasks:
                             print(task.get_time_for_mix1(),
                                   task.get_time_for_mix2(),
@@ -116,8 +117,20 @@ class HandleEvent:
                         # SCH_Add_Task(task_temp,"task_name_2",0,'thread_name_2',2,2)
                         # SCH_Add_Task(delete_task_by_name,'dell_ahihi',3,'thread_name_3',"task_name_1")
                     # xoá lịch
-                    elif eventData['command'].upper()=='REMOVE_SCHEDULE':
-                        pass
+                    elif eventData['command'].upper()=='GET_TASK':
+                        taskIdQuery = eventData['payload']['taskId']
+                        neededTaskLst =[taskItem for taskItem 
+                                            in LIST_OF_TASK 
+                                                if taskItem.get_taskId() == taskIdQuery]
+                                            
+                        neededTask = neededTaskLst[0].get_dic_format() if len(neededTaskLst)>0 else ""
+                        print('neededTask:',neededTask)
+                        connectorObj.sendData(RESPONSE_IOT_GATE,
+                            Utilization.gen_response_message('SUCCESS',
+                                                             eventData['commandId'],
+                                                             'GET_TASK',
+                                                             "no task " if neededTask=="" else "get task success",
+                                                             neededTask))
                     elif eventData['command'].upper()=='REMOVE_TASK':
                         pass
                     elif eventData['command'].upper()=='GET_HISTORY':

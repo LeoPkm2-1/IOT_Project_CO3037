@@ -160,6 +160,26 @@ class Task (Schedule):
         self.flow3=schedule.flow3
         return self
 
+    def get_dic_format(self):
+        return {
+            "taskId": self.taskId,
+            "scheduleId": self.scheduleId,
+            "scheduleName": self.scheduleName,
+            "cycle": self.cycle,
+            # "scheduleStartTime": self.scheduleStartTime.strftime(self.DATE_TIME_FORMAT),
+            # "scheduleEndTime": self.scheduleEndTime,
+            "flow1": self.flow1,
+            "flow2": self.flow2,
+            "flow3": self.flow3,
+            "startAt": self.startAt.strftime(self.DATE_TIME_FORMAT),
+            "endAt": self.endAt.strftime(self.DATE_TIME_FORMAT),
+            "presentStatus": self.presentStatus,
+        }
+    
+    def get_json_string_format(self):
+        task = self.get_dic_format();
+        return json.dumps(task)
+
     def set_startAt(self, startAt):
         self.startAt = startAt
 
