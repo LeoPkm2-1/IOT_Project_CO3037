@@ -13,7 +13,7 @@ class HandleTask:
     def add_task_into_scheduler(task:Task):
         # waitingTime = (task.get_startAt() - datetime.datetime.now()).total_seconds()
         # waitingTime = waitingTime if waitingTime>0 else 0
-        waitingTime = 1
+        waitingTime = 14
         def excutor(threadName,
                     TimeForMix1,
                     TimeForMix2,
@@ -23,7 +23,7 @@ class HandleTask:
             if task.get_time_for_mix1()>0:
                 # pumpOpened
                 pumpOpened =True
-                print(f"  {task.get_status()}",'Open Pump')
+                print(f"  {task.get_status()}",'Open Pump__',task.get_taskId())
                 task.switch_status_running()
                 print('    Run Mix-1',task.get_status())
             def mix_2():
@@ -62,6 +62,19 @@ class HandleTask:
                      task.get_time_pump_out()
                      )
         
+        
+    @staticmethod
+    def remove_task_out_of_scheduler(task:Task):
+        def delete_executor(thread_name,task_name):
+            SCH_Delete_Task_Name(task_name);
+            return
+        SCH_Add_Task(delete_executor,
+                     f"delete_{task.get_taskId()}",
+                     0,
+                     f"thread_delete_{task.get_taskId()}",
+                     task.get_taskId()
+                     )
+        
 class HandleEvent:
     @staticmethod
     def default_message_cb(connectorObj:ADAFRUIT_CONNECTOR):
@@ -72,50 +85,63 @@ class HandleEvent:
                     # Thêm lịch 
                     if eventData['command'].upper()=='ADD_SCHEDULE':
                         schedule=Schedule(**eventData['payload'])
+                        # check startTime is valid
                         if schedule.scheduleStartTime < datetime.datetime.now():
                             raise Exception("START_TIME_IN_PASS")
                         if schedule.scheduleEndTime and schedule.scheduleEndTime <= schedule.scheduleStartTime:
                             raise Exception("END_TIME_AND_START_TIME_NOT_TRUE")
                         listOfTasks = HandleSchedule(schedule).get_list_of_tasks()
-                        LIST_OF_TASK.extend(listOfTasks)
-                        connectorObj.sendData(RESPONSE_IOT_GATE,
-                            Utilization.gen_response_message('SUCCESS',
-                                                             eventData['commandId'],
-                                                             'ADD_SCHEDULE',
-                                                             'schedule ok',
-                                                             eventData['payload']))
-                        for task in LIST_OF_TASK:
-                            print(task.taskId)
-                        for task in listOfTasks:
-                            print(task.get_time_for_mix1(),
-                                  task.get_time_for_mix2(),
-                                  task.get_time_for_mix3(),
-                                  task.get_time_pump_out())
-                            HandleTask.add_task_into_scheduler(task)
-                        # for task in LIST_OF_TASK:
-                        #     print(task.get_taskId())
-                        
-                        # def acb(thread_name,deylay1):
-                        #     print('\tRun mix 1')
-                        #     def mix2():
-                        #         print("\t\tend mix 1")
-                        #         return
-                        #     threading.Timer(deylay1,mix2).start()
-                        # def task_temp(thread_name,delay1,delay2):
-                        #     print('\t===RUN MIX 2')
-                        #     def mix():
-                        #         print('\t===END_M2')
-                        #         def func():
-                        #             print('\t===ahihi')
-                        #             return;
-                        #         threading.Timer(delay2,func).start()
-                        #     threading.Timer(delay1,mix).start()
-                        # def delete_task_by_name(thread_name,task_name):
-                        #     SCH_Delete_Task_Name(task_name)
-                        #     return
-                        # SCH_Add_Task(acb,'task_name_1',0,"thread_name_1",0)
-                        # SCH_Add_Task(task_temp,"task_name_2",0,'thread_name_2',2,2)
-                        # SCH_Add_Task(delete_task_by_name,'dell_ahihi',3,'thread_name_3',"task_name_1")
+                        # # Check list time conflict
+                        # conflictTasks = Utilization.list_task_conflict_with_tasks1(listOfTasks)
+                        conflictTasks = []      # For test
+                        if len(conflictTasks)>0:
+                            connectorObj.sendData(RESPONSE_IOT_GATE,
+                                Utilization.gen_response_message('ERROR',
+                                                                 eventData['commandId'],
+                                                                 'ADD_SCHEDULE',
+                                                                 "Schedule conflict with following tasks",
+                                                                 [task.get_taskId() for task in conflictTasks]))
+                            
+                        else:
+                            LIST_OF_TASK.extend(listOfTasks)
+                            connectorObj.sendData(RESPONSE_IOT_GATE,
+                                Utilization.gen_response_message('SUCCESS',
+                                                                eventData['commandId'],
+                                                                'ADD_SCHEDULE',
+                                                                'Insert schedule succesfully, the tasks id are',
+                                                                [task.get_taskId() for task in listOfTasks]
+                                                                ))
+
+                            for task in listOfTasks:
+                                print(task.get_time_for_mix1(),
+                                    task.get_time_for_mix2(),
+                                    task.get_time_for_mix3(),
+                                    task.get_time_pump_out())
+                                HandleTask.add_task_into_scheduler(task)
+
+                            for task in LIST_OF_TASK:
+                                print(task.get_taskId())                            
+                            # def acb(thread_name,deylay1):
+                            #     print('\tRun mix 1')
+                            #     def mix2():
+                            #         print("\t\tend mix 1")
+                            #         return
+                            #     threading.Timer(deylay1,mix2).start()
+                            # def task_temp(thread_name,delay1,delay2):
+                            #     print('\t===RUN MIX 2')
+                            #     def mix():
+                            #         print('\t===END_M2')
+                            #         def func():
+                            #             print('\t===ahihi')
+                            #             return;
+                            #         threading.Timer(delay2,func).start()
+                            #     threading.Timer(delay1,mix).start()
+                            # def delete_task_by_name(thread_name,task_name):
+                            #     SCH_Delete_Task_Name(task_name)
+                            #     return
+                            # SCH_Add_Task(acb,'task_name_1',0,"thread_name_1",0)
+                            # SCH_Add_Task(task_temp,"task_name_2",0,'thread_name_2',2,2)
+                            # SCH_Add_Task(delete_task_by_name,'dell_ahihi',3,'thread_name_3',"task_name_1")
                     # xoá lịch
                     elif eventData['command'].upper()=='GET_TASK':
                         taskIdQuery = eventData['payload']['taskId']
@@ -129,12 +155,41 @@ class HandleEvent:
                             Utilization.gen_response_message('SUCCESS',
                                                              eventData['commandId'],
                                                              'GET_TASK',
-                                                             "no task " if neededTask=="" else "get task success",
+                                                             "no task" if neededTask=="" else "get task success",
                                                              neededTask))
                     elif eventData['command'].upper()=='REMOVE_TASK':
-                        pass
-                    elif eventData['command'].upper()=='GET_HISTORY':
-                        pass
+                        taskIdQuery = eventData['payload']['taskId']
+                        print(f"id_: {taskIdQuery}")
+                        neededTaskLst =[taskItem for taskItem 
+                                            in LIST_OF_TASK 
+                                                if taskItem.get_taskId() == taskIdQuery]
+                        if len(neededTaskLst)<=0:       # no task to remove
+                            connectorObj.sendData(RESPONSE_IOT_GATE,
+                                Utilization.gen_response_message('ERROR',
+                                                                eventData['commandId'],
+                                                                'REMOVE_TASK',
+                                                                "no task to delete" ,
+                                                                ''))
+                        else:
+                            neededRemoveTask = neededTaskLst[0]
+                            if not neededRemoveTask.isWaiting():
+                              connectorObj.sendData(RESPONSE_IOT_GATE,
+                                  Utilization.gen_response_message('ERROR',
+                                                                  eventData['commandId'],
+                                                                  'REMOVE_TASK',
+                                                                  f"task with id {taskIdQuery} is {neededRemoveTask.get_status().lower()} so not remove" ,
+                                                                  ''))
+                            else:
+                              HandleTask.remove_task_out_of_scheduler(neededRemoveTask)
+                              connectorObj.sendData(RESPONSE_IOT_GATE,
+                                Utilization.gen_response_message('SUCCESS',
+                                                                eventData['commandId'],
+                                                                'REMOVE_TASK',
+                                                                f"delete complete task {taskIdQuery}" ,
+                                                                ''))
+                              
+                            
+                        
             except Exception as error:
                 error_message = str(error)
                 print(error_message,type(error_message))

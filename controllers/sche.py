@@ -1,7 +1,7 @@
 import threading
 import _thread
 
-SCH_MAX_TASKS = 1000  # Define this as per your requirement
+SCH_MAX_TASKS = 10000  # Define this as per your requirement
 SCH_tasks_G = [None] * SCH_MAX_TASKS
 current_index_task = 0
 Error_code_G = 0

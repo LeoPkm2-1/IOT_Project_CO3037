@@ -43,6 +43,23 @@ class Utilization:
             "payload":payload
         }
         return json.dumps(resMsg)
+    
+    @staticmethod
+    def check_two_task_conflict(task1,task2):
+        return task1.is_conflict_with(task2)
+    
+    @staticmethod
+    def list_task_conflict_with_tasks1(tasks1):
+        listOfNotDoneTasks = [task for task in LIST_OF_TASK if not task.isDone()]
+        conflictTaskLst = []
+        for task1 in tasks1:
+            for task2 in listOfNotDoneTasks:
+                if task1.is_conflict_with(task2):
+                    conflictTaskLst.append(task2)
+        return conflictTaskLst
+        # print('=== LIST_OF_TASK')
+        # for task in LIST_OF_TASK:
+        #     print('===',task.taskId,task.get_status())        
 
 class Schedule:
     DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -238,7 +255,14 @@ class Task (Schedule):
              - cycle:{self.cycle} - cycleType:{self.cycleType}\
              - scheduleStartTime:{self.scheduleStartTime} - scheduleEndTime:{self.scheduleEndTime}\
              - flow1:{self.flow1} - flow2:{self.flow2} - flow3:{self.flow3}\
-             - startAt:{self.startAt} - endAt:{self.endAt}"    
+             - startAt:{self.startAt} - endAt:{self.endAt}"   
+    
+    def is_conflict_with(self,task2) :
+        if task2.get_endAt() <= self.get_startAt() or self.get_endAt() <= task2.get_startAt():
+            return False
+        return True
+
+        
 
 class HandleSchedule:
     def __init__(self, schedule: Schedule):
