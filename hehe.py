@@ -10,7 +10,7 @@ def getPort():
     for i in range(0, N):
         port = ports[i]
         strPort = str(port)
-        print('N',N)
+        print('N',N)    # insert
         if "USB" in strPort:
             splitPort = strPort.split(" ")
             commPort = (splitPort[0])
@@ -20,7 +20,7 @@ def getPort():
 portName = "/dev/ttyUSB1"
 print(portName)
 
-
+getPort()
 
 # try:
 #     ser = serial.Serial(port=portName, baudrate=115200)
