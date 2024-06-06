@@ -28,8 +28,11 @@ try:
 except:
     print("Can not open the port")
 
-relay1_ON  = [0, 6, 0, 0, 0, 255, 200, 91]
-relay1_OFF = [0, 6, 0, 0, 0, 0, 136, 27]
+# relay1_ON  = [0, 6, 0, 0, 0, 255, 200, 91]
+# relay1_OFF = [0, 6, 0, 0, 0, 0, 136, 27]
+
+relay1_ON  = [1, 6, 0, 0, 0, 255, 201, 138]
+relay1_OFF = [1, 6, 0, 0, 0, 0, 137, 202]
 
 def setDevice1(state):
     if state == True:
