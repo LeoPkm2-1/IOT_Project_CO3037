@@ -22,7 +22,7 @@ portName = "/dev/ttyUSB1"
 # print(portName)
 
 # getPort()
-print(''getPort',getPort())
+print('getPort',getPort())
 
 # try:
 #     ser = serial.Serial(port=portName, baudrate=115200)
