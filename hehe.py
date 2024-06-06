@@ -18,17 +18,15 @@ def getPort():
     return commPort
     # return "/dev/ttyUSB1"
 
-portName = "/dev/ttyUSB1"
+portName = getPort()
 # print(portName)
 
-# getPort()
-print('getPort',getPort())
 
-# try:
-#     ser = serial.Serial(port=portName, baudrate=115200)
-#     print("Open successfully")
-# except:
-#     print("Can not open the port")
+try:
+    ser = serial.Serial(port=portName, baudrate=115200)
+    print("Open successfully")
+except:
+    print("Can not open the port")
 
 # relay1_ON  = [0, 6, 0, 0, 0, 255, 200, 91]
 # relay1_OFF = [0, 6, 0, 0, 0, 0, 136, 27]
