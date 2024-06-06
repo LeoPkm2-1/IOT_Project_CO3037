@@ -11,7 +11,7 @@ def getPort():
     for i in range(0, N):
         port = ports[i]
         strPort = str(port)
-        print('strPort',strPort)
+        print('strPort___',strPort)
         if "USB" in strPort:
             splitPort = strPort.split(" ")
             commPort = (splitPort[0])
@@ -19,7 +19,7 @@ def getPort():
     # return "/dev/ttyUSB1"
 
 portName = getPort()
-# print(portName)
+print(portName)
 
 
 try:
