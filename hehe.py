@@ -10,6 +10,7 @@ def getPort():
     for i in range(0, N):
         port = ports[i]
         strPort = str(port)
+        print('N',N)
         if "USB" in strPort:
             splitPort = strPort.split(" ")
             commPort = (splitPort[0])
