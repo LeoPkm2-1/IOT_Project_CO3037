@@ -15,11 +15,11 @@ def getPort():
         if "USB" in strPort:
             splitPort = strPort.split(" ")
             commPort = (splitPort[0])
-    return commPort
-    # return "/dev/ttyUSB1"
+    # return commPort
+    return "/dev/ttyUSB7"
 
 portName = getPort()
-print(portName)
+print('portName___',portName)
 
 
 try:
