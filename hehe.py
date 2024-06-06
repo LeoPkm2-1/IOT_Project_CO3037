@@ -6,11 +6,11 @@ import serial.tools.list_ports
 def getPort():
     ports = serial.tools.list_ports.comports()
     N = len(ports)
+    print('N_____',N)    # insert
     commPort = "None"
     for i in range(0, N):
         port = ports[i]
         strPort = str(port)
-        print('N',N)    # insert
         if "USB" in strPort:
             splitPort = strPort.split(" ")
             commPort = (splitPort[0])
