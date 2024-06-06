@@ -47,8 +47,7 @@ def setDevice1(state):
 
 def serial_read_data(ser):
     bytesToRead = ser.inWaiting()
-    print('ahihih==============')
-    print(bytesToRead)
+    print('bytesToRead',bytesToRead)
     if bytesToRead > 0:
         out = ser.read(bytesToRead)
         data_array = [b for b in out]
