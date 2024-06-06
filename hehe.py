@@ -28,17 +28,20 @@ try:
 except:
     print("Can not open the port")
 
-relay1_ON  = [0, 6, 0, 0, 0, 255, 200, 91]
-relay1_OFF = [0, 6, 0, 0, 0, 0, 136, 27]
+# relay1_ON  = [0, 6, 0, 0, 0, 255, 200, 91]
+# relay1_OFF = [0, 6, 0, 0, 0, 0, 136, 27]
 
 # relay1_ON  = [1, 6, 0, 0, 0, 255, 201, 138]
 # relay1_OFF = [1, 6, 0, 0, 0, 0, 137, 202]
 
+relay5_ON  = [5, 6, 0, 0, 0, 255, 200, 14]
+relay5_OFF = [5, 6, 0, 0, 0, 0, 136, 78]
+
 def setDevice1(state):
     if state == True:
-        ser.write(relay1_ON)
+        ser.write(relay5_ON)
     else:
-        ser.write(relay1_OFF)
+        ser.write(relay5_OFF)
     time.sleep(1)
     print(serial_read_data(ser))
 
