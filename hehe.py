@@ -53,6 +53,7 @@ def serial_read_data(ser):
         print('data_array',data_array)
         if len(data_array) >= 7:
             array_size = len(data_array)
+            print('array_size',array_size)
             value = data_array[array_size - 4] * 256 + data_array[array_size - 3]
             return value
         else:
