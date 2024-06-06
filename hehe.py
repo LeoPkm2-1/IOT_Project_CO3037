@@ -15,8 +15,8 @@ def getPort():
         if "USB" in strPort:
             splitPort = strPort.split(" ")
             commPort = (splitPort[0])
-    # return commPort
-    return "/dev/ttyUSB1"
+    return commPort
+    # return "/dev/ttyUSB1"
 
 portName = getPort()
 # print(portName)
@@ -47,6 +47,7 @@ def setDevice1(state):
 
 def serial_read_data(ser):
     bytesToRead = ser.inWaiting()
+    print(bytesToRead)
     if bytesToRead > 0:
         out = ser.read(bytesToRead)
         data_array = [b for b in out]
