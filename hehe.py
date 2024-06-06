@@ -15,8 +15,8 @@ def getPort():
         if "USB" in strPort:
             splitPort = strPort.split(" ")
             commPort = (splitPort[0])
-    # return commPort
-    return "/dev/ttyUSB7"
+    return commPort
+    # return "/dev/ttyUSB7"
 
 portName = getPort()
 print('portName___',portName)
@@ -47,7 +47,7 @@ def setDevice1(state):
 
 def serial_read_data(ser):
     bytesToRead = ser.inWaiting()
-    print('bytesToRead',bytesToRead)
+    print('\t\tbytesToRead',bytesToRead)
     if bytesToRead > 0:
         out = ser.read(bytesToRead)
         data_array = [b for b in out]
@@ -62,11 +62,11 @@ def serial_read_data(ser):
     return 0
 
 
-# while True:
-#     setDevice1(True)
-#     time.sleep(1)
-#     setDevice1(False)
-#     time.sleep(1)
+while True:
+    setDevice1(True)
+    time.sleep(1)
+    setDevice1(False)
+    time.sleep(1)
 
 # soil_temperature =[1, 3, 0, 6, 0, 1, 100, 11]
 # def readTemperature():
