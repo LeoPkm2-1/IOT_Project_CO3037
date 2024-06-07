@@ -1,4 +1,4 @@
-from pymodbus.client.sync import ModbusSerialClient as ModbusClient
+from pymodbus.client import ModbusSerialClient as ModbusClient
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadBuilder
 
@@ -6,7 +6,7 @@ from pymodbus.payload import BinaryPayloadBuilder
 client = ModbusClient(
     method='rtu',
     port='/dev/ttyUSB0',  # Replace with your serial port
-    baudrate=9600,
+    baudrate=115200,
     timeout=1,
     parity='N',
     stopbits=1,
