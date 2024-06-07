@@ -18,24 +18,26 @@ connection = client.connect()
 if not connection:
     print("Failed to connect to Modbus server.")
     exit(1)
+    
+print(Endian.BIG)
 
-# Prepare data to send
-builder = BinaryPayloadBuilder(endian=Endian.Little)
-builder.add_16bit_uint(12345)  # Example data, replace with actual data
+# # Prepare data to send
+# builder = BinaryPayloadBuilder(endian=Endian.Little)
+# builder.add_16bit_uint(12345)  # Example data, replace with actual data
 
-payload = builder.build()
+# payload = builder.build()
 
-# Write to a holding register (e.g., register address 1)
-address = 1
-result = client.write_registers(address, payload)
+# # Write to a holding register (e.g., register address 1)
+# address = 1
+# result = client.write_registers(address, payload)
 
-if result.isError():
-    print("Error writing data to the Modbus server.")
-else:
-    print("Data successfully written to the Modbus server.")
+# if result.isError():
+#     print("Error writing data to the Modbus server.")
+# else:
+#     print("Data successfully written to the Modbus server.")
 
-# Close the connection
-client.close()
+# # Close the connection
+# client.close()
 
 # from pymodbus.client import ModbusSerialClient as ModbusClient
 
