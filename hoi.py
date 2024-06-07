@@ -1,4 +1,4 @@
-from pymodbus.client.sync import ModbusSerialClient as ModbusClient
+from pymodbus.client import ModbusSerialClient as ModbusClient
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadBuilder
 import serial.tools.list_ports
@@ -32,6 +32,9 @@ connection = client.connect()
 if not connection:
     print("Failed to connect to Modbus server.")
     exit(1)
+else:
+    print("Connect ok")
+    
 
 
 
