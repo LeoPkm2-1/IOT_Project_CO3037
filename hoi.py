@@ -5,9 +5,9 @@ client = ModbusClient(method='rtu', port='/dev/ttyUSB0', baudrate=115200, timeou
 client.connect()
 
 # Read holding registers (e.g., register 30222 to 30232)
-read = client.read_holding_registers(address=222, count=10, unit=1)
-data = read.registers[2]  # Read register 30223
-print(f"Data read: {data}")
+# read = client.read_holding_registers(address=222, count=10, unit=1)
+# data = read.registers[2]  # Read register 30223
+# print(f"Data read: {data}")
 
 # Write values to registers (e.g., address 10)
 client.write_multiple_registers(10, [44, 55])
