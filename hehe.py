@@ -62,6 +62,7 @@ except:
 # relay5_OFF = [5, 6, 0, 0, 0, 0, 136, 78]
 
 def setDevice1(state):
+    print('\t\trelay2_ON')
     if state == True:
         ser.write(relay2_ON)
     else:
