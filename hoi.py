@@ -24,7 +24,7 @@ print(Endian.BIG)
 
 # Prepare data to send
 builder = BinaryPayloadBuilder()
-builder.add_16bit_uint(12345)  # Example data, replace with actual data
+builder.add_16bit_uint(1)  # Example data, replace with actual data
 
 payload = builder.build()
 
