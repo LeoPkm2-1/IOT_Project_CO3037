@@ -37,7 +37,22 @@ else:
     
 
 
+builder = BinaryPayloadBuilder(endian=Endian.Little)
+builder.add_16bit_uint(2233)  # Example data, replace with actual data
 
+payload = builder.build()
+
+# Write to a holding register (e.g., register address 1)
+address = 1
+result = client.write_registers(address, payload)
+
+if result.isError():
+    print("Error writing data to the Modbus server.")
+else:
+    print("Data successfully written to the Modbus server.")
+
+# Close the connection
+client.close()
 
 
 
