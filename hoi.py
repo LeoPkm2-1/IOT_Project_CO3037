@@ -54,7 +54,7 @@ response = ser.read(1)
 # Close the serial connection
 ser.close()
 
-
+print('response',response)
 # Parse and print the response
 def parse_write_response(response):
     if len(response) != 1:
