@@ -53,3 +53,32 @@ response = ser.read(8)
 
 # Close the serial connection
 ser.close()
+
+
+# Parse and print the response
+def parse_write_response(response):
+    if len(response) != 8:
+        raise Exception("Invalid response length")
+
+    slave_address = response[0]
+    function_code = response[1]
+    start_address = struct.unpack('>H', response[2:4])[0]
+    quantity_of_registers = struct.unpack('>H', response[4:6])[0]
+    crc_received = struct.unpack('<H', response[-2:])[0]
+    crc_calculated = calculate_crc(response[:-2])
+
+    if crc_received != crc_calculated:
+        raise Exception("CRC mismatch")
+
+    return {
+        "slave_address": slave_address,
+        "function_code": function_code,
+        "start_address": start_address,
+        "quantity_of_registers": quantity_of_registers
+    }
+
+try:
+    result = parse_write_response(response)
+    print("Write successful:", result)
+except Exception as e:
+    print("Error:", e)
