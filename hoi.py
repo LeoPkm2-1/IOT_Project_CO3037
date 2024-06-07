@@ -19,6 +19,7 @@ if not connection:
     print("Failed to connect to Modbus server.")
     exit(1)
     
+print(Endian.LITTLE)
 print(Endian.BIG)
 
 # # Prepare data to send
