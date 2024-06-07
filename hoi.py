@@ -19,7 +19,7 @@ def getPort():
 client = ModbusClient(
     method='rtu',
     # port='/dev/ttyUSB0',  # Replace with your serial port
-    port=getPort()
+    port=getPort(),
     baudrate=115200,
     timeout=1,
     parity='N',
