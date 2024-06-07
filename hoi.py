@@ -37,14 +37,14 @@ else:
     
 
 
-builder = BinaryPayloadBuilder(endian=Endian.Little)
+builder = BinaryPayloadBuilder(byteorder=Endian.Big, wordorder=Endian.Little)
 builder.add_16bit_uint(2233)  # Example data, replace with actual data
 
 payload = builder.build()
 
-# Write to a holding register (e.g., register address 1)
+# Write to a holding register (e.g., starting at register address 1)
 address = 1
-result = client.write_registers(address, payload)
+result = client.write_registers(address, payload, skip_encode=True)
 
 if result.isError():
     print("Error writing data to the Modbus server.")
