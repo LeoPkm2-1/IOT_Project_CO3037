@@ -23,7 +23,7 @@ print(Endian.LITTLE)
 print(Endian.BIG)
 
 # Prepare data to send
-builder = BinaryPayloadBuilder(endian=Endian.LITTLE)
+builder = BinaryPayloadBuilder()
 builder.add_16bit_uint(12345)  # Example data, replace with actual data
 
 payload = builder.build()
