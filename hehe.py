@@ -63,11 +63,11 @@ except:
 
 def setDevice1(state):
     if state == True:
-        print('\t\t relay2_ON')
-        ser.write(relay2_ON)
+        print('\t\t relay3_ON')
+        ser.write(relay3_ON)
     else:
-        print('\t\t relay2_OFF')
-        ser.write(relay2_OFF)
+        print('\t\t relay3_OFF')
+        ser.write(relay3_OFF)
     time.sleep(1)
     print(serial_read_data(ser))
 
