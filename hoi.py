@@ -49,7 +49,7 @@ request = construct_write_request(slave_address, start_address, values)
 ser.write(request)
 
 # Read the response (fixed size for write multiple registers)
-response = ser.read(8)
+response = ser.read(1)
 
 # Close the serial connection
 ser.close()
@@ -57,7 +57,7 @@ ser.close()
 
 # Parse and print the response
 def parse_write_response(response):
-    if len(response) != 8:
+    if len(response) != 1:
         raise Exception("Invalid response length")
 
     slave_address = response[0]
