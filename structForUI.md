@@ -60,3 +60,28 @@
     }
 }
 ```
+
+# Delete task
+
+1. structure:
+```json
+{
+    "command": "REMOVE_TASK"
+    ,"commandId": string
+    ,"payload": {
+        "taskId": string
+    }
+}
+```
+
+
+2. Example:
+```json
+{
+    "command": "REMOVE_TASK"
+    ,"commandId":"commandId_ahihi_1"
+    ,"payload": {
+        "taskId":"0_1_2024_06_05_23_53_47_247527"
+    }
+}
+```

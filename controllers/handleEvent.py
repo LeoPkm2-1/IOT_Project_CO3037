@@ -2,6 +2,7 @@ from .setting import HandleSchedule,Task,Schedule,LIST_OF_TASK,LIST_OF_SCHEDULES
 from .setting import Utilization
 from .connector import ADAFRUIT_CONNECTOR,RESPONSE_IOT_GATE,LISTEN_IOT_GATE
 from  .sche import SCH_Add_Task,SCH_Delete_Task_Name
+from rs485_handler import set_device_state , serial_read_data
 import datetime
 import json
 import _thread
