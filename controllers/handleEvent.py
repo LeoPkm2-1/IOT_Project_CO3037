@@ -1,8 +1,8 @@
 from .setting import HandleSchedule,Task,Schedule,LIST_OF_TASK,LIST_OF_SCHEDULES
 from .setting import Utilization
 from .connector import ADAFRUIT_CONNECTOR,RESPONSE_IOT_GATE,LISTEN_IOT_GATE
-from  .sche import SCH_Add_Task,SCH_Delete_Task_Name
-from rs485_handler import set_device_state , serial_read_data
+from .sche import SCH_Add_Task,SCH_Delete_Task_Name
+from .rs485_handler import set_device_state , serial_read_data
 import datetime
 import json
 import _thread
@@ -208,7 +208,14 @@ class HandleEvent:
                                                          eventData['commandId'],
                                                          'ADD_SCHEDULE',
                                                          'start time and end time not true',
-                                                         eventData['payload']))                    
+                                                         eventData['payload']))
+                elif error_message == 'THE_AREA_NOT_EXIST':
+                    connectorObj.sendData(RESPONSE_IOT_GATE,
+                        Utilization.gen_response_message("ERROR",
+                                                         eventData['commandId'],
+                                                         'ADD_SCHEDULE',
+                                                         'the area does not exist',
+                                                         eventData['payload']))
             
         return executor
     

@@ -33,6 +33,14 @@ class Utilization:
             return True
         except ValueError:
             return False
+    
+    @staticmethod
+    def is_valid_int(value):
+        try:
+            int(value)
+            return True
+        except ValueError:
+            return False
     @staticmethod
     def gen_response_message(status:str,command_id:str,command:str,msg,payload):
         resMsg = {
@@ -57,9 +65,7 @@ class Utilization:
                 if task1.is_conflict_with(task2):
                     conflictTaskLst.append(task2)
         return conflictTaskLst
-        # print('=== LIST_OF_TASK')
-        # for task in LIST_OF_TASK:
-        #     print('===',task.taskId,task.get_status())        
+     
 
 class Schedule:
     DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -67,7 +73,7 @@ class Schedule:
     def __init__(self, scheduleId: str,
                  scheduleName: str,
                  cycle,
-                 cycleType,
+                 area:str,
                  scheduleStartTime: str,
                  scheduleEndTime: str,
                  flow1=0,
@@ -77,7 +83,7 @@ class Schedule:
         self.scheduleId = scheduleId
         self.scheduleName = scheduleName
         self.cycle = int(cycle) if cycle.strip() else ''
-        self.cycleType = str(cycleType).strip().upper()
+        self.area = int(area) if Utilization.is_valid_int(area) else 0
         self.scheduleStartTime = datetime.datetime.strptime(
             scheduleStartTime, self.DATE_TIME_FORMAT) if scheduleStartTime.upper() !='NOW' else datetime.datetime.now().strftime(self.DATE_TIME_FORMAT)
         self.scheduleEndTime = datetime.datetime.strptime(
@@ -86,17 +92,11 @@ class Schedule:
         self.flow1 = float(flow1) if Utilization.is_valid_number(flow1) else 0
         self.flow2 = float(flow2) if Utilization.is_valid_number(flow2) else 0
         self.flow3 = float(flow3) if Utilization.is_valid_number(flow3) else 0
-
-
-        # if self.scheduleStartTime < datetime.datetime.now():
-        #     raise Exception("START_TIME_IN_PASS")
-
-            
-
+        
 
     def __str__(self) -> str:
         return f"scheduleId:{self.scheduleId} - scheduleName:{self.scheduleName}\
-             - cycle:{self.cycle} - cycleType:{self.cycleType}\
+             - cycle:{self.cycle} - area:{self.area}\
              - scheduleStartTime:{self.scheduleStartTime} - scheduleEndTime:{self.scheduleEndTime}\
              - flow1:{self.flow1} - flow2:{self.flow2} - flow3:{self.flow3}"
 
@@ -132,6 +132,9 @@ class Schedule:
 
     def get_time_task_taking(self):
         return self.get_time_for_mix() + self.get_time_pump_out()
+    
+    def get_area(self):
+        return self.area
 
 class Task (Schedule):
 
@@ -140,7 +143,7 @@ class Task (Schedule):
                  scheduleId='',
                  scheduleName= '',
                  cycle= '',
-                 cycleType= '',
+                 area= '',
                  scheduleStartTime=datetime.datetime.now().strftime(DATE_TIME_FORMAT),
                  scheduleEndTime= '',
                  flow1=0,
@@ -152,7 +155,7 @@ class Task (Schedule):
         super().__init__(scheduleId,
                          scheduleName,
                          cycle,
-                         cycleType,
+                         area,
                          scheduleStartTime,
                          scheduleEndTime,
                          flow1,
@@ -169,7 +172,7 @@ class Task (Schedule):
         self.scheduleId=schedule.scheduleId
         self.scheduleName=schedule.scheduleName
         self.cycle=schedule.cycle
-        self.cycleType=schedule.cycleType
+        self.area=schedule.area
         self.scheduleStartTime=schedule.scheduleStartTime
         self.scheduleEndTime=schedule.scheduleEndTime
         self.flow1=schedule.flow1
@@ -252,7 +255,7 @@ class Task (Schedule):
         return self
     def __str__(self) -> str:
         return f"taskId:{self.taskId} - scheduleId:{self.scheduleId} - scheduleName:{self.scheduleName}\
-             - cycle:{self.cycle} - cycleType:{self.cycleType}\
+             - cycle:{self.cycle} - area:{self.area}\
              - scheduleStartTime:{self.scheduleStartTime} - scheduleEndTime:{self.scheduleEndTime}\
              - flow1:{self.flow1} - flow2:{self.flow2} - flow3:{self.flow3}\
              - startAt:{self.startAt} - endAt:{self.endAt}"   
