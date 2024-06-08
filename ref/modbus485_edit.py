@@ -35,12 +35,10 @@ class Modbus485:
     def modbus485_read_adc(self):
         ser = self.rs485
         bytesToRead = ser.inWaiting()
-        print('bytesToRead: ',bytesToRead)
         if bytesToRead > 0:
             out = ser.read(bytesToRead)
             data_array = [b for b in out]
-            print("Buffer: ",out)
-            print("Date_array: ",data_array,'\n')
+            print(data_array)
             if len(data_array) >= 7:
                 array_size = len(data_array)
                 value = data_array[array_size - 4] * 256 + data_array[array_size - 3]

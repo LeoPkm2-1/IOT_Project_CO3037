@@ -36,7 +36,7 @@ relay8_OFF = [8, 6, 0, 0, 0, 0, 137, 83]
 
 
 m485.modbus485_send(relay1_ON)
-# time.sleep(1)
+time.sleep(1)
 # m485.modbus485_send(relay2_ON)
 # time.sleep(1)
 # m485.modbus485_send(relay3_ON)
