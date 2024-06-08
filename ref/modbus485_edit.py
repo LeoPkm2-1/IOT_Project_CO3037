@@ -7,12 +7,13 @@ class Modbus485:
     
     def modbus485_send(self, data):
         ser = self.rs485
-        self.modbus485_read_adc()
+        # self.modbus485_read_adc()
         try:
             ser.write(serial.to_bytes(data))
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
             return 0
+        self.modbus485_read_adc()
         return 
     
     def modbus485_read(self):
