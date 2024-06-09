@@ -47,7 +47,7 @@ print(f"portName: {portName}")
 
 
 try:
-    ser = serial.Serial(port=portName, baudrate=115200)
+    ser = serial.Serial(port=portName, baudrate=9600)
     print("__Open successfully")
 except:
     print("__Can not open the port")
