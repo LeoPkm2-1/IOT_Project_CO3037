@@ -131,7 +131,7 @@ class Modbus485:
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
         time.sleep(0.07)
-        print(f'data__: {self.serial_read_data()}')
+        print(f'__data__: {self.serial_read_data()}')
 
 
     def set_device_2(self,state):
@@ -144,7 +144,7 @@ class Modbus485:
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
         time.sleep(0.07)
-        print(f'data__: {self.serial_read_data()}')
+        print(f'__data__: {self.serial_read_data()}')
 
     def set_device_3(self,state):
         ser = self.rs485
@@ -156,7 +156,7 @@ class Modbus485:
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
         time.sleep(0.07)
-        print(f'data__: {self.serial_read_data()}')
+        print(f'__data__: {self.serial_read_data()}')
         
         
     def set_device_4(self,state):
@@ -169,7 +169,7 @@ class Modbus485:
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
         time.sleep(0.07)
-        print(f'data__: {self.serial_read_data()}')
+        print(f'__data__: {self.serial_read_data()}')
         
         
     def set_device_5(self,state):
@@ -182,7 +182,7 @@ class Modbus485:
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
         time.sleep(0.07)
-        print(f'data__: {self.serial_read_data()}')
+        print(f'__data__: {self.serial_read_data()}')
                 
         
     def set_device_6(self,state):
@@ -195,7 +195,7 @@ class Modbus485:
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
         time.sleep(0.07)
-        print(f'data__: {self.serial_read_data()}')
+        print(f'__data__: {self.serial_read_data()}')
         
     def set_device_7(self,state):
         ser = self.rs485
@@ -207,7 +207,7 @@ class Modbus485:
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
         time.sleep(0.07)
-        print(f'data__: {self.serial_read_data()}')
+        print(f'__data__: {self.serial_read_data()}')
 
 
     def set_device_8(self,state):
@@ -220,7 +220,7 @@ class Modbus485:
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
         time.sleep(0.07)
-        print(f'data__: {self.serial_read_data()}')
+        print(f'__data__: {self.serial_read_data()}')
 
 
     def set_device_state(self,deviceId=1,state=True):
