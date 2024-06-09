@@ -32,6 +32,7 @@ import time
 
 try:
     ser = serial.Serial(port='/dev/ttyUSB0', baudrate=9600)
+    print(ser)
 except:
     print("Modbus485**","Failed to write data")
 
