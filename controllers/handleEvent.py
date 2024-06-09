@@ -249,8 +249,7 @@ class HandleEvent:
                                                       Utilization.gen_response_message('SUCCESS',
                                                                                        eventData['commandId'],
                                                                                        'REMOVE_TASK',
-                                                                                       f"delete complete task {
-                                                                                           taskIdQuery}",
+                                                                                       f"delete complete task {taskIdQuery}",
                                                                                        ''))
 
             except Exception as error:
