@@ -225,21 +225,21 @@ class Modbus485:
 
     def set_device_state(self,deviceId=1,state=True):
         if deviceId == 1:
-            self.set_device_1(state=state)
+            self.set_device_1(state)
         elif deviceId == 2:
-            self.set_device_2(state=state)
+            self.set_device_2(state)
         elif deviceId == 3:
-            self.set_device_3(state=state)
+            self.set_device_3(state)
         elif deviceId == 4:
-            self.set_device_4(state=state)
+            self.set_device_4(state)
         elif deviceId == 5:
-            self.set_device_5(state=state)        
+            self.set_device_5(state)        
         elif deviceId == 6:
-            self.set_device_6(state=state)  
+            self.set_device_6(state)  
         elif deviceId == 7:
-            self.set_device_7(state=state)
+            self.set_device_7(state)
         elif deviceId == 8:
-            self.set_device_8(state=state)
+            self.set_device_8(state)
 
 
     def serial_read_data(self):
