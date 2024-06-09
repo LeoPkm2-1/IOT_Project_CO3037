@@ -1,15 +1,3 @@
-import modbus485_edit
-import serial as serial
-import time
-
-
-try:
-    ser = serial.Serial(port='/dev/ttyUSB0', baudrate=9600)
-except:
-    print("Modbus485**","Failed to write data")
-
-m485 = modbus485_edit.Modbus485(ser)
-
 relay1_ON  = [1, 6, 0, 0, 0, 255, 201, 138]
 relay1_OFF = [1, 6, 0, 0, 0, 0, 137, 202]
 
@@ -35,38 +23,53 @@ relay8_ON  = [8, 6, 0, 0, 0, 255, 201, 19]
 relay8_OFF = [8, 6, 0, 0, 0, 0, 137, 83]
 
 
-# m485.modbus485_send(relay1_ON)
-# time.sleep(1)
-m485.modbus485_send(relay2_ON)
-time.sleep(0.05)
-# m485.modbus485_send(relay3_ON)
-# time.sleep(1)
-# m485.modbus485_send(relay4_ON)
-# time.sleep(1)
-# m485.modbus485_send(relay5_ON)
-# time.sleep(1)
-# m485.modbus485_send(relay6_ON)
-# time.sleep(1)
-# m485.modbus485_send(relay7_ON)
-# time.sleep(1)
-# m485.modbus485_send(relay8_ON)
 
-# time.sleep(1)
-# m485.modbus485_send(relay1_OFF)
-# time.sleep(1)
-# m485.modbus485_send(relay2_OFF)
-# time.sleep(1)
-# m485.modbus485_send(relay3_OFF)
-# time.sleep(1)
-# m485.modbus485_send(relay4_OFF)
-# time.sleep(1)
-# m485.modbus485_send(relay5_OFF)
-# time.sleep(1)
-# m485.modbus485_send(relay6_OFF)
-# time.sleep(1)
-# m485.modbus485_send(relay7_OFF)
-# time.sleep(1)
-# m485.modbus485_send(relay8_OFF)
-# time.sleep(1)
+
+import modbus485
+import serial as serial
+import time
+
+
+try:
+    ser = serial.Serial(port='/dev/ttyUSB0', baudrate=9600)
+except:
+    print("Modbus485**","Failed to write data")
+
+m485 = modbus485.Modbus485(ser)
+
+
+m485.modbus485_send(relay1_ON)
+time.sleep(1)
+m485.modbus485_send(relay2_ON)
+time.sleep(1)
+m485.modbus485_send(relay3_ON)
+time.sleep(1)
+m485.modbus485_send(relay4_ON)
+time.sleep(1)
+m485.modbus485_send(relay5_ON)
+time.sleep(1)
+m485.modbus485_send(relay6_ON)
+time.sleep(1)
+m485.modbus485_send(relay7_ON)
+time.sleep(1)
+m485.modbus485_send(relay8_ON)
+
+time.sleep(1)
+m485.modbus485_send(relay1_OFF)
+time.sleep(1)
+m485.modbus485_send(relay2_OFF)
+time.sleep(1)
+m485.modbus485_send(relay3_OFF)
+time.sleep(1)
+m485.modbus485_send(relay4_OFF)
+time.sleep(1)
+m485.modbus485_send(relay5_OFF)
+time.sleep(1)
+m485.modbus485_send(relay6_OFF)
+time.sleep(1)
+m485.modbus485_send(relay7_OFF)
+time.sleep(1)
+m485.modbus485_send(relay8_OFF)
+time.sleep(1)
 
 m485.modbus485_read()
