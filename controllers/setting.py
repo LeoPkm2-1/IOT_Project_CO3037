@@ -85,7 +85,7 @@ class Schedule:
         self.cycle = int(cycle) if cycle.strip() else ''
         self.area = int(area) if Utilization.is_valid_int(area) else 0
         self.scheduleStartTime = datetime.datetime.strptime(
-            scheduleStartTime, self.DATE_TIME_FORMAT) if scheduleStartTime.upper() !='NOW' else datetime.datetime.now() + datetime.timedelta(seconds=0.01)
+            scheduleStartTime, self.DATE_TIME_FORMAT) if scheduleStartTime.upper() !='NOW' else datetime.datetime.now() + datetime.timedelta(seconds=0.1)
         self.scheduleEndTime = datetime.datetime.strptime(
             scheduleEndTime, self.DATE_TIME_FORMAT
         ) if Utilization.is_valid_date_time(str(scheduleEndTime)) else ''
