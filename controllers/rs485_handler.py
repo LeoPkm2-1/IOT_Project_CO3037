@@ -262,3 +262,10 @@ modbusControler = Modbus485(ser)
 
 if __name__ =='__main__':
     modbusControler.set_device_state(2,True)
+    temp_data =[10, 3,2,0,11,92,66]
+    modbusControler.modbus485_send(temp_data)
+    time.sleep(0.1)
+    temp_data =[10, 3,2,20,187,82,246]
+    modbusControler.modbus485_send(temp_data)
+    time.sleep(0.1)
+    print('data:__',modbusControler.serial_read_data())
