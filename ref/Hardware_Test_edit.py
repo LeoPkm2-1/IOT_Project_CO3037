@@ -25,7 +25,7 @@ relay8_OFF = [8, 6, 0, 0, 0, 0, 137, 83]
 
 
 
-import modbus485
+import modbus485_edit
 import serial as serial
 import time
 
@@ -35,7 +35,7 @@ try:
 except:
     print("Modbus485**","Failed to write data")
 
-m485 = modbus485.Modbus485(ser)
+m485 = modbus485_edit.Modbus485(ser)
 
 
 m485.modbus485_send(relay1_ON)
