@@ -79,7 +79,7 @@ class Modbus485:
     def modbus485_clear_buffer(self):
         ser = self.rs485
         bytesToRead = ser.inWaiting()
-        print('_bytesToRead: ',bytesToRead)
+        print('\t_bytesToRead: ',bytesToRead)
         if bytesToRead > 0:
             out = ser.read(bytesToRead)
             print("__Buffer: ",out)
@@ -245,11 +245,11 @@ class Modbus485:
     def serial_read_data(self):
         ser = self.rs485
         bytesToRead = ser.inWaiting()
-        print(f'_bytesToRead: {bytesToRead}')
+        print(f'\t_bytesToRead: {bytesToRead}')
         if bytesToRead > 0:
             out = ser.read(bytesToRead)
             data_array = [b for b in out]
-            print(f'__data_array: {data_array}')
+            print(f'\t__data_array: {data_array}')
             if len(data_array) >= 7:
                 array_size = len(data_array)
                 value = data_array[array_size - 4] * 256 + data_array[array_size - 3]
