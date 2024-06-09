@@ -23,6 +23,8 @@ relay8_ON  = [8, 6, 0, 0, 0, 255, 201, 19]
 relay8_OFF = [8, 6, 0, 0, 0, 0, 137, 83]
 
 
+relay_temp = [1, 6, 0, 0, 0, 255, 0,0]
+
 
 
 import modbus485_edit
@@ -39,22 +41,22 @@ except:
 m485 = modbus485_edit.Modbus485(ser)
 
 
-m485.modbus485_send(relay1_ON)
+m485.modbus485_send(relay_temp)
 time.sleep(0.03)
-m485.modbus485_send(relay2_ON)
-time.sleep(0.03)
-m485.modbus485_send(relay3_ON)
-time.sleep(0.03)
-m485.modbus485_send(relay4_ON)
-time.sleep(0.03)
-m485.modbus485_send(relay5_ON)
-time.sleep(0.03)
-m485.modbus485_send(relay6_ON)
-time.sleep(0.03)
-m485.modbus485_send(relay7_ON)
-time.sleep(0.03)
-m485.modbus485_send(relay8_ON)
-time.sleep(0.03)
+# m485.modbus485_send(relay2_ON)
+# time.sleep(0.03)
+# m485.modbus485_send(relay3_ON)
+# time.sleep(0.03)
+# m485.modbus485_send(relay4_ON)
+# time.sleep(0.03)
+# m485.modbus485_send(relay5_ON)
+# time.sleep(0.03)
+# m485.modbus485_send(relay6_ON)
+# time.sleep(0.03)
+# m485.modbus485_send(relay7_ON)
+# time.sleep(0.03)
+# m485.modbus485_send(relay8_ON)
+# time.sleep(0.03)
 
 # m485.modbus485_read()
 data = m485.modbus485_read_adc()
