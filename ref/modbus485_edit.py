@@ -18,16 +18,18 @@ class Modbus485:
     def modbus485_read(self):
         ser = self.rs485
         bytesToRead = ser.inWaiting()
+        print('_bytesToRead: ',bytesToRead)
         if bytesToRead > 0:
             out = ser.read(bytesToRead)
             data_array = [b for b in out]
-            print('Received Data:', data_array)
+            print('__Received Data:', data_array)
             return data_array
         return []
     
     def modbus485_clear_buffer(self):
         ser = self.rs485
         bytesToRead = ser.inWaiting()
+        print('_bytesToRead: ',bytesToRead)
         if bytesToRead > 0:
             out = ser.read(bytesToRead)
             print("Buffer: ",out)
