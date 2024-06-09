@@ -31,7 +31,9 @@ class HandleTask:
                 mixer1Ran = True
                 task.switch_status_running()               # change task status to Running
                 print(f"  {task.get_status()}", 'Open Pump__',task.get_taskId())    # pumpOpened
+                SerialController.set_device_7(True)
                 print('  Run Mix-1', task.get_status())                             # Run Mix-1
+                SerialController.set_device_1(True)
             def mix_2():
                 nonlocal pumpOpened
                 nonlocal mixer1Ran
@@ -43,10 +45,13 @@ class HandleTask:
                     if not pumpOpened:
                         pumpOpened = True
                         print(f"  {task.get_status()}",'Open Pump') # pumpOpened
+                        SerialController.set_device_7(True)
                     if mixer1Ran:                                   # end mix-1
                         mixer1Ran = False
                         print('\t   End Mix-1', task.get_status())
+                        SerialController.set_device_1(False)
                     print('\t   Run Mix-2', task.get_status())
+                    SerialController.set_device_2(True)
                 def mix_3():
                     nonlocal pumpOpened
                     nonlocal mixer1Ran
@@ -59,13 +64,17 @@ class HandleTask:
                         if not pumpOpened:
                             pumpOpened = True
                             print(f"  {task.get_status()}", 'Open Pump')    # pumpOpened
+                            SerialController.set_device_7(True)
                         if mixer1Ran:
                             mixer1Ran = False
-                            print('\t\tEnd Mix-1')                          # end mix-1                            
+                            print('\t\tEnd Mix-1')                          # end mix-1
+                            SerialController.set_device_1(False)                            
                         if mixer2Ran:
                             mixer2Ran = False
                             print('\t\tEnd Mix-2')                          # end mix-2
+                            SerialController.set_device_2(False)
                         print('\t\tRun Mix-3', task.get_status())
+                        SerialController.set_device_3(True)
                     def pump_out():
                         nonlocal pumpOpened
                         nonlocal mixer1Ran
@@ -75,21 +84,29 @@ class HandleTask:
                             if mixer1Ran:
                                 mixer1Ran = False
                                 print('\t \t End Mix-1')    # end mix-1
+                                SerialController.set_device_1(False)
                             if mixer2Ran:
                                 mixer2Ran = False
-                                print('\t \t End Mix-2')    # end mix-2                 
+                                print('\t \t End Mix-2')    # end mix-2
+                                SerialController.set_device_2(False)                 
                             if mixer3Ran:
                                 mixer3Ran = False
                                 print('\t \t End Mix-3')    # end mix-3
+                                SerialController.set_device_3(False)
                             if pumpOpened:
                                 pumpOpened = False
                                 print('\t \t End Pump-in')  # end pump-in
+                                SerialController.set_device_7(False)
                             print(f'\t \t selector_{task.get_area()},Pump out', task.get_status())
+                            SerialController.set_device_state(3+int(task.get_area()),True)
+                            SerialController.set_device_8(True)
                         def wait_pump_out():
                             if task.get_time_pump_out() > 0:
                                 task.switch_status_done()
                                 print('\t\t\tend selector')                     # end Selector
                                 print('\t\t\tend pump out', task.get_status())  # end Pump out
+                                SerialController.set_device_state(3+int(task.get_area()),False)
+                                SerialController.set_device_8(False)
                             return
                         threading.Timer(TimeForPumpOut, wait_pump_out).start()
                     threading.Timer(TimeForMix3, pump_out).start()
@@ -135,9 +152,9 @@ class HandleEvent:
                             raise Exception("END_TIME_AND_START_TIME_NOT_TRUE")
                         listOfTasks = HandleSchedule(
                             schedule).get_list_of_tasks()
-                        # # Check list time conflict
-                        # conflictTasks = Utilization.list_task_conflict_with_tasks1(listOfTasks)
-                        conflictTasks = []      # For test
+                        # Check list time conflict
+                        conflictTasks = Utilization.list_task_conflict_with_tasks1(listOfTasks)
+                        # conflictTasks = []      # For test
                         if len(conflictTasks) > 0:
                             connectorObj.sendData(RESPONSE_IOT_GATE,
                                                   Utilization.gen_response_message('ERROR',
