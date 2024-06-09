@@ -53,7 +53,7 @@ m485.modbus485_send(relay6_ON)
 time.sleep(0.1)
 m485.modbus485_send(relay7_ON)
 time.sleep(0.1)
-m485.modbus485_send(relay1_OFF)
+m485.modbus485_send(relay8_ON)
 time.sleep(0.1)
 
 # m485.modbus485_read()
