@@ -55,4 +55,6 @@ time.sleep(1)
 m485.modbus485_send(relay8_ON)
 time.sleep(1)
 
-m485.modbus485_read()
+# m485.modbus485_read()
+data = m485.modbus485_read_adc()
+print("hehe: ",data)
