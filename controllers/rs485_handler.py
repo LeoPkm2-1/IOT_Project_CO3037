@@ -45,7 +45,7 @@ portName = getPort()
 print(f"portName: {portName}")
 
 
-
+ser=None
 try:
     ser = serial.Serial(port=portName, baudrate=9600)
     print("__Open successfully")
@@ -258,14 +258,14 @@ class Modbus485:
                 return -1
         return 0
     
-modbusControler = Modbus485(ser)
+SerialController = Modbus485(ser)
 
 if __name__ =='__main__':
-    # modbusControler.set_device_state(2,True)
+    # SerialController.set_device_state(2,True)
     temp_data =[10, 3,2,0,11,92,66]
-    modbusControler.modbus485_send(temp_data)
+    SerialController.modbus485_send(temp_data)
     time.sleep(0.1)
     temp_data =[10, 3,2,20,187,82,246]
-    modbusControler.modbus485_send(temp_data)
+    SerialController.modbus485_send(temp_data)
     time.sleep(0.1)
-    print('data:__',modbusControler.serial_read_data())
+    print('data:__',SerialController.serial_read_data())
