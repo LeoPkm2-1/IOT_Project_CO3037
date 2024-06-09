@@ -32,7 +32,7 @@ class Modbus485:
         print('_bytesToRead: ',bytesToRead)
         if bytesToRead > 0:
             out = ser.read(bytesToRead)
-            print("Buffer: ",out)
+            print("__Buffer: ",out)
             
     def modbus485_read_adc(self):
         ser = self.rs485
