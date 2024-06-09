@@ -53,5 +53,6 @@ time.sleep(1)
 m485.modbus485_send(relay7_ON)
 time.sleep(1)
 m485.modbus485_send(relay8_ON)
+time.sleep(1)
 
 m485.modbus485_read()
