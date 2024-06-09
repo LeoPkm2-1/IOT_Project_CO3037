@@ -261,7 +261,7 @@ class Modbus485:
 modbusControler = Modbus485(ser)
 
 if __name__ =='__main__':
-    modbusControler.set_device_state(2,True)
+    # modbusControler.set_device_state(2,True)
     temp_data =[10, 3,2,0,11,92,66]
     modbusControler.modbus485_send(temp_data)
     time.sleep(0.1)
