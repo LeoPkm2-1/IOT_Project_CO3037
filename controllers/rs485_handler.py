@@ -1,4 +1,5 @@
 import time
+import struct
 import serial.tools.list_ports
 
 relay1_ON  = [1, 6, 0, 0, 0, 255, 201, 138]
@@ -64,106 +65,200 @@ class Modbus485:
             print("Modbus485**","Failed to write data:",e)
             return 0
         return 1
-
-
     
-# def serial_read_data(ser):
-#     bytesToRead = ser.inWaiting()
-#     if bytesToRead > 0:
-#         out = ser.read(bytesToRead)
-#         data_array = [b for b in out]
-#         print(data_array)
-#         if len(data_array) >= 7:
-#             array_size = len(data_array)
-#             value = data_array[array_size - 4] * 256 + data_array[array_size - 3]
-#             return value
-#         else:
-#             return -1
-#     return 0
+    def modbus485_read(self):
+        ser = self.rs485
+        bytesToRead = ser.inWaiting()
+        if bytesToRead > 0:
+            out = ser.read(bytesToRead)
+            data_array = [b for b in out]
+            print('Received Data:', data_array)
+            return data_array
+        return []
     
-# def setDevice1(state):
-#     if state == True:
-#         ser.write(relay1_ON)
-#     else:
-#         ser.write(relay1_OFF)
-#     time.sleep(1)
-#     print(serial_read_data(ser))
+    def modbus485_clear_buffer(self):
+        ser = self.rs485
+        bytesToRead = ser.inWaiting()
+        print('_bytesToRead: ',bytesToRead)
+        if bytesToRead > 0:
+            out = ser.read(bytesToRead)
+            print("__Buffer: ",out)
+            
+    def modbus485_read_adc(self):
+        ser = self.rs485
+        bytesToRead = ser.inWaiting()
+        if bytesToRead > 0:
+            out = ser.read(bytesToRead)
+            data_array = [b for b in out]
+            print(data_array)
+            if len(data_array) >= 7:
+                array_size = len(data_array)
+                value = data_array[array_size - 4] * 256 + data_array[array_size - 3]
+                return value
+            else:
+                return 400
+        return 404
     
+    def modbus485_read_big_endian(self):
+        ser = self.rs485
+        bytesToRead = ser.inWaiting()
+        return_array = [0, 0, 0, 0]
+        if bytesToRead > 0:
+            out = ser.read(bytesToRead)
+            data_array = [b for b in out]
+            print(data_array)
+            
+            if len(data_array) >= 7:
+                return_array[0] = return_array[5]
+                return_array[1] = return_array[6]
+                return_array[2] = return_array[3]
+                return_array[3] = return_array[4]
+                print("Modbus485**", "Raw Data: ",return_array)
+                
+                [value] = struct.unpack('>f', bytearray(return_array))
+                return value
+            else:
+                return 400
+        return 404
+    
+    def set_device_1(self,state):
+        ser = self.rs485
+        try:
+            if state == True:
+                ser.write(serial.to_bytes(relay1_ON))
+            else:
+                ser.write(serial.to_bytes(relay1_OFF))
+        except Exception as e:
+            print("Modbus485**","Failed to write data:",e)
+        time.sleep(0.05)
+        print(f'data__: {self.serial_read_data()}')
 
-# def set_device_1(state):
-#     if state == True:
-#         ser.write(relay1_ON)
-#     else:
-#         ser.write(relay1_OFF)
 
-# def set_device_2(state):
-#     if state == True:
-#         ser.write(relay2_ON)
-#     else:
-#         ser.write(relay2_OFF)
+    def set_device_2(self,state):
+        ser = self.rs485
+        try:
+            if state == True:
+                ser.write(serial.to_bytes(relay2_ON))
+            else:
+                ser.write(serial.to_bytes(relay2_OFF))
+        except Exception as e:
+            print("Modbus485**","Failed to write data:",e)
+        time.sleep(0.05)
+        print(f'data__: {self.serial_read_data()}')
 
-# def set_device_3(state):
-#     if state == True:
-#         ser.write(relay3_ON)
-#     else:
-#         ser.write(relay3_OFF)
+    def set_device_3(self,state):
+        ser = self.rs485
+        try:
+            if state == True:
+                ser.write(serial.to_bytes(relay3_ON))
+            else:
+                ser.write(serial.to_bytes(relay3_OFF))
+        except Exception as e:
+            print("Modbus485**","Failed to write data:",e)
+        time.sleep(0.05)
+        print(f'data__: {self.serial_read_data()}')
         
         
-# def set_device_4(state):
-#     if state == True:
-#         ser.write(relay4_ON)
-#     else:
-#         ser.write(relay4_OFF)
-
-# def set_device_5(state):
-#     if state == True:
-#         ser.write(relay5_ON)
-#     else:
-#         ser.write(relay5_OFF)
+    def set_device_4(self,state):
+        ser = self.rs485
+        try:
+            if state == True:
+                ser.write(serial.to_bytes(relay4_ON))
+            else:
+                ser.write(serial.to_bytes(relay4_OFF))
+        except Exception as e:
+            print("Modbus485**","Failed to write data:",e)
+        time.sleep(0.05)
+        print(f'data__: {self.serial_read_data()}')
         
-# def set_device_6(state):
-#     if state == True:
-#         ser.write(relay6_ON)
-#     else:
-#         ser.write(relay6_OFF)
         
-# def set_device_7(state):
-#     if state == True:
-#         ser.write(relay7_ON)
-#     else:
-#         ser.write(relay7_OFF)
+    def set_device_5(self,state):
+        ser = self.rs485
+        try:
+            if state == True:
+                ser.write(serial.to_bytes(relay5_ON))
+            else:
+                ser.write(serial.to_bytes(relay5_OFF))
+        except Exception as e:
+            print("Modbus485**","Failed to write data:",e)
+        time.sleep(0.05)
+        print(f'data__: {self.serial_read_data()}')
+                
         
-# def set_device_8(state):
-#     if state == True:
-#         ser.write(relay8_ON)
-#     else:
-#         ser.write(relay8_OFF)
+    def set_device_6(self,state):
+        ser = self.rs485
+        try:
+            if state == True:
+                ser.write(serial.to_bytes(relay6_ON))
+            else:
+                ser.write(serial.to_bytes(relay6_OFF))
+        except Exception as e:
+            print("Modbus485**","Failed to write data:",e)
+        time.sleep(0.05)
+        print(f'data__: {self.serial_read_data()}')
+        
+    def set_device_7(self,state):
+        ser = self.rs485
+        try:
+            if state == True:
+                ser.write(serial.to_bytes(relay7_ON))
+            else:
+                ser.write(serial.to_bytes(relay7_OFF))
+        except Exception as e:
+            print("Modbus485**","Failed to write data:",e)
+        time.sleep(0.05)
+        print(f'data__: {self.serial_read_data()}')
 
 
-# def set_device_state(deviceId=1,state=True):
-#     if deviceId == 1:
-#         set_device_1(state=state)
-#     elif deviceId == 2:
-#         set_device_2(state=state)
-#     elif deviceId == 3:
-#         set_device_3(state=state)
-#     elif deviceId == 4:
-#         set_device_4(state=state)
-#     elif deviceId == 5:
-#         set_device_5(state=state)        
-#     elif deviceId == 6:
-#         set_device_6(state=state)  
-#     elif deviceId == 7:
-#         set_device_7(state=state)
-#     elif deviceId == 8:
-#         set_device_8(state=state)
+    def set_device_8(self,state):
+        ser = self.rs485
+        try:
+            if state == True:
+                ser.write(serial.to_bytes(relay8_ON))
+            else:
+                ser.write(serial.to_bytes(relay8_OFF))
+        except Exception as e:
+            print("Modbus485**","Failed to write data:",e)
+        time.sleep(0.05)
+        print(f'data__: {self.serial_read_data()}')
 
 
+    def set_device_state(self,deviceId=1,state=True):
+        if deviceId == 1:
+            self.set_device_1(state=state)
+        elif deviceId == 2:
+            self.set_device_2(state=state)
+        elif deviceId == 3:
+            self.set_device_3(state=state)
+        elif deviceId == 4:
+            self.set_device_4(state=state)
+        elif deviceId == 5:
+            self.set_device_5(state=state)        
+        elif deviceId == 6:
+            self.set_device_6(state=state)  
+        elif deviceId == 7:
+            self.set_device_7(state=state)
+        elif deviceId == 8:
+            self.set_device_8(state=state)
 
 
-# if __name__ =='__main__':
-#     while True:
-#         set_device_1(True)
-#         time.sleep(2)
-#         set_device_1(False)
-#         time.sleep(2)
+    def serial_read_data(self):
+        ser = self.rs485
+        bytesToRead = ser.inWaiting()
+        print(f'_bytesToRead: {bytesToRead}')
+        if bytesToRead > 0:
+            out = ser.read(bytesToRead)
+            data_array = [b for b in out]
+            print(f'__data_array: {data_array}')
+            if len(data_array) >= 7:
+                array_size = len(data_array)
+                value = data_array[array_size - 4] * 256 + data_array[array_size - 3]
+                return value
+            else:
+                return -1
+        return 0
+    
+modbusControler = Modbus485(ser)
+
+if __name__ =='__main__':
+    modbusControler.set_device_state(2,True)
