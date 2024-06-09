@@ -13,9 +13,9 @@ import threading
 class HandleTask:
     @staticmethod
     def add_task_into_scheduler(task: Task):
-        # waitingTime = (task.get_startAt() - datetime.datetime.now()).total_seconds()
-        # waitingTime = waitingTime if waitingTime>0 else 0
-        waitingTime = 3
+        waitingTime = (task.get_startAt() - datetime.datetime.now()).total_seconds()
+        waitingTime = waitingTime if waitingTime>0 else 0
+        # waitingTime = 3
 
         def excutor(threadName,
                     TimeForMix1,
