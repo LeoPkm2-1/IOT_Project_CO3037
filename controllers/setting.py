@@ -86,7 +86,7 @@ class Schedule:
         self.area = int(area) if Utilization.is_valid_int(area) else 0
         print('____timee_',scheduleStartTime)
         self.scheduleStartTime = datetime.datetime.strptime(
-            scheduleStartTime, self.DATE_TIME_FORMAT) if scheduleStartTime.upper() !='NOW' else datetime.datetime.now() 
+            scheduleStartTime, self.DATE_TIME_FORMAT) if scheduleStartTime.upper() !='NOW' else datetime.datetime.now() + datetime.timedelta(seconds=1)
         print(self.scheduleStartTime)
         # .strptime(self.DATE_TIME_FORMAT)
         self.scheduleEndTime = datetime.datetime.strptime(
