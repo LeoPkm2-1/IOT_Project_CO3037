@@ -240,8 +240,7 @@ class HandleEvent:
                                                       Utilization.gen_response_message('ERROR',
                                                                                        eventData['commandId'],
                                                                                        'REMOVE_TASK',
-                                                                                       f"task with id {taskIdQuery} is {
-                                                                                           neededRemoveTask.get_status().lower()} so not remove",
+                                                                                       f"task with id {taskIdQuery} is {neededRemoveTask.get_status().lower()} so not remove",
                                                                                        ''))
                             else:
                                 HandleTask.remove_task_out_of_scheduler(
