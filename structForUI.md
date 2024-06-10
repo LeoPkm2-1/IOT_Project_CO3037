@@ -85,3 +85,27 @@
     }
 }
 ```
+
+# Event when task running
+***Just listen event***
+1. structure:
+```json
+{
+    "status": "SUCCESS",
+    "commandId": "",
+    "command": "TASK_RUNNING",
+    "message": "Task with the following id is running",
+    "payload": task_id
+}
+```
+
+2. Example:
+```json
+{
+    "status": "SUCCESS",
+    "commandId": "",
+    "command": "TASK_RUNNING",
+    "message": "Task with the following id is running",
+    "payload": "0_1_2024_06_10_13_57_28_657810"
+}
+```

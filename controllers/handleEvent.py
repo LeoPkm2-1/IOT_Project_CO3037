@@ -12,10 +12,10 @@ import threading
 
 class HandleTask:
     @staticmethod
-    def add_task_into_scheduler(task: Task):
-        waitingTime = (task.get_startAt() - datetime.datetime.now()).total_seconds()
-        waitingTime = waitingTime if waitingTime>0 else 0
-        # waitingTime = 3
+    def add_task_into_scheduler(task: Task,connectorObj: ADAFRUIT_CONNECTOR):
+        # waitingTime = (task.get_startAt() - datetime.datetime.now()).total_seconds()
+        # waitingTime = waitingTime if waitingTime>0 else 0
+        waitingTime = 3
 
         def excutor(threadName,
                     TimeForMix1,
@@ -24,6 +24,13 @@ class HandleTask:
                     TimeForPumpOut):
             pumpOpened = False
             mixer1Ran = False
+            
+            connectorObj.sendData(RESPONSE_IOT_GATE,Utilization.gen_response_message('SUCCESS',
+                                                                                     '',
+                                                                                     'TASK_RUNNING',
+                                                                                     'Task with the following id is running',
+                                                                                     task.get_taskId()
+                                                                                     ))
             
             
             if task.get_time_for_mix1() > 0:
@@ -179,7 +186,7 @@ class HandleEvent:
                                       task.get_time_for_mix2(),
                                       task.get_time_for_mix3(),
                                       task.get_time_pump_out())
-                                HandleTask.add_task_into_scheduler(task)
+                                HandleTask.add_task_into_scheduler(task,connectorObj)
 
                             for task in LIST_OF_TASK:
                                 print(task.get_taskId())

@@ -194,6 +194,10 @@ class Task (Schedule):
             "startAt": self.startAt.strftime(self.DATE_TIME_FORMAT),
             "endAt": self.endAt.strftime(self.DATE_TIME_FORMAT),
             "presentStatus": self.presentStatus,
+            "timeForMix1": self.get_time_for_mix1(),
+            "timeForMix2": self.get_time_for_mix2(),
+            "timeForMix3": self.get_time_for_mix3(),
+            "timeForSelectorAndPumpOut": self.get_time_pump_out(),
         }
     
     def get_json_string_format(self):
