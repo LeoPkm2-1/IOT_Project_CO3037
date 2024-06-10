@@ -3,7 +3,7 @@ import 'package:smart_farm/values/app_colors.dart';
 
 class AppImages {
   static final String imagePath = 'assets/images/';
-  static final String img_test = '${imagePath}img_test.png';
+  static final String img_hethong = '${imagePath}img_hethong.png';
 }
 
 class AppIcons {

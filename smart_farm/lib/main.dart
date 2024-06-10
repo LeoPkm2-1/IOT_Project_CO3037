@@ -8,6 +8,8 @@ import 'package:smart_farm/pages/pg_control.dart';
 import 'package:flutter/services.dart';
 import 'package:smart_farm/pages/pg_main.dart';
 
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 void main() async {
   MqttInstance();
 
@@ -34,6 +36,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      scaffoldMessengerKey: scaffoldMessengerKey,
       home: MainPage(),
     );
   }

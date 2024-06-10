@@ -187,7 +187,7 @@ class EventStruct {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Đạm: ${flow1}kg; Lân: ${flow2}kg; Kali: ${flow3}kg => 50 lít nước',
+                  'Đạm: ${flow1}kg; Lân: ${flow2}kg; Kali: ${flow3}kg',
                   style: AppStyles.textRegular14.copyWith(color: AppColors.white),
                 ),
               ),

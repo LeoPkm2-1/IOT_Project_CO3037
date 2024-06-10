@@ -7,7 +7,7 @@ class EventDataSingleton extends ChangeNotifier {
   List<EventStruct> _eventList = [];
 
   EventDataSingleton._privateConstructor() {
-    _loadData();
+    // _loadData();
   }
 
   static final EventDataSingleton _instance = EventDataSingleton._privateConstructor();
@@ -31,11 +31,27 @@ class EventDataSingleton extends ChangeNotifier {
     } else {
       _eventList.insert(insertIndex, event);
     }
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String data = EventStruct.listToJson(_eventList);
-    await prefs.setString('eventList', data);
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // String data = EventStruct.listToJson(_eventList);
+    // await prefs.setString('eventList', data);
 
     notifyListeners();
+  }
+
+  Future<void> removeEvent(String taskId) async {
+    print('Remove event: $taskId');
+    _eventList.removeWhere((event) => event.taskId == taskId);
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // String data = EventStruct.listToJson(_eventList);
+    // await prefs.setString('eventList', data);
+
+    notifyListeners();
+  }
+
+  String getEventBasicInfo(String taskId) {
+    // Find the event with taskId and return its basic info
+    EventStruct event = _eventList.firstWhere((event) => event.taskId == taskId);
+    return '${event.area} - ${event.taskName}: ${event.taskStartTime} - ${event.taskEndTime}';
   }
 }
 

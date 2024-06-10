@@ -365,7 +365,7 @@ class _StatusWidgetState extends State<StatusWidget> {
       width: double.infinity,
       height: 320,
       color: AppColors.primaryGreen,
-      child: Image.asset(AppImages.img_test, fit: BoxFit.cover),
+      child: Image.asset(AppImages.img_hethong, fit: BoxFit.cover),
     );
   }
 }
@@ -854,7 +854,18 @@ class _ManualControlState extends State<ManualControl> {
       final flow2 = double.parse(_flow2);
       final flow3 = double.parse(_flow3);
       final area = int.parse(selectedArea.first);
-      MqttInstance().mqttAddSchedule(scheduleId, scheduleName, cycle, scheduleStartTime, scheduleEndTime, flow1, flow2, flow3, area);
+      MqttInstance().mqttAddSchedule(
+          scheduleId,
+          scheduleName,
+          cycle,
+          scheduleStartTime,
+          scheduleEndTime,
+          flow1,
+          flow2,
+          flow3,
+          area,
+          (bool isSuccess, String? message) {}
+      );
     }
   }
 
@@ -1059,14 +1070,201 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       width: double.infinity,
       child: Container(
         child: SfCalendar(
-          view: CalendarView.week,
+          view: CalendarView.schedule,
+          showTodayButton: true,
+          allowViewNavigation: true,
+          allowedViews: const <CalendarView>[
+            CalendarView.schedule,
+            CalendarView.day,
+            CalendarView.week,
+            CalendarView.month,
+          ],
+          headerDateFormat: 'MM/yyyy',
+          headerStyle: CalendarHeaderStyle(
+            textAlign: TextAlign.left,
+            backgroundColor: AppColors.white,
+            textStyle: AppStyles.textBold14.copyWith(color: AppColors.black),
+          ),
+
+          scheduleViewSettings: ScheduleViewSettings(
+            appointmentItemHeight: 90,
+            hideEmptyScheduleWeek: false,
+            weekHeaderSettings: WeekHeaderSettings(
+              startDateFormat: 'Tuần dd/MM',
+              endDateFormat: ' dd/MM',
+              height: 30,
+              backgroundColor: AppColors.grey,
+              textAlign: TextAlign.center,
+              weekTextStyle: AppStyles.textRegular14.copyWith(color: AppColors.black),
+            ),
+            monthHeaderSettings: MonthHeaderSettings(
+              height: 70,
+              monthFormat: 'MM/yyyy',
+              backgroundColor: AppColors.white,
+              textAlign: TextAlign.left,
+              monthTextStyle: AppStyles.textBold14.copyWith(fontSize: 20, color: AppColors.black),
+            ),
+          ),
           firstDayOfWeek: 1,
           todayHighlightColor: AppColors.primaryGreen,
           dataSource: EventDataSource(getAppointment(context)),
+
+          appointmentBuilder: appointmentBuilder,
         ),
       ),
     );
   }
+}
+
+Widget appointmentBuilder(BuildContext context, CalendarAppointmentDetails calendarAppointmentDetails) {
+  final appointment = calendarAppointmentDetails.appointments.first;
+  // i want the appointment show Subject \n StartTime - EndTime \n Notes, and clickable
+  return GestureDetector(
+    onTap: () {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 800, maxHeight: 470),
+                child: AlertDialog(
+                  contentPadding: const EdgeInsets.only(left: 0, right: 0, top: 10, bottom: 0),
+                  titlePadding: const EdgeInsets.only(left: 0, right: 0, top: 10, bottom: 10),
+                  title: Text(
+                      'Chi tiết lịch tưới',
+                      style: AppStyles.textBold14.copyWith(fontSize: 20, color: AppColors.black),
+                      textAlign: TextAlign.center,
+                  ),
+                  content: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Tên lịch:', style: AppStyles.textBold14),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text('${appointment.subject.split(' - ')[1]}', style: AppStyles.textRegular14, textAlign: TextAlign.right)
+                      ),
+                      const SizedBox(height: 10),
+                      Text('Thời gian bắt đầu:', style: AppStyles.textBold14),
+                      Align(
+                          alignment: Alignment.centerRight,
+                          child: Text('${DateFormat('HH:mm:ss dd/MM/yyyy').format(appointment.startTime)}', style: AppStyles.textRegular14, textAlign: TextAlign.right)
+                      ),
+                      const SizedBox(height: 10),
+                      Text('Thời gian kết thúc:', style: AppStyles.textBold14),
+                      Align(
+                          alignment: Alignment.centerRight,
+                          child: Text('${DateFormat('HH:mm:ss dd/MM/yyyy').format(appointment.endTime)}', style: AppStyles.textRegular14, textAlign: TextAlign.right)
+                      ),
+                      const SizedBox(height: 10),
+                      Text('Khu vực:', style: AppStyles.textBold14),
+                      Align(
+                          alignment: Alignment.centerRight,
+                          child: Text('${appointment.subject.split(' - ')[0]}', style: AppStyles.textRegular14, textAlign: TextAlign.right)
+                      ),
+                      const SizedBox(height: 10),
+                      Text('Lượng tưới:', style: AppStyles.textBold14),
+                      Align(
+                          alignment: Alignment.centerRight,
+                          child: Text('${appointment.notes}', style: AppStyles.textRegular14, textAlign: TextAlign.right)
+                      ),
+                    ],
+                  ),
+                  // scrollable: true,
+                  actionsPadding: const EdgeInsets.only(left: 0, right: 0, top: 10, bottom: 0),
+                  actionsAlignment: MainAxisAlignment.center,
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        // Delete the appointment
+                        MqttInstance().mqttRemoveTask(appointment.id);
+                        Navigator.of(context).pop();
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(AppColors.primaryGreen),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                        ),
+                      ),
+                      child: Text('Xóa lịch', style: AppStyles.textSemiBold14.copyWith(color: AppColors.white)),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(AppColors.primaryGreen),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                        ),
+                      ),
+                      child: Text('Đóng', style: AppStyles.textSemiBold14.copyWith(color: AppColors.white)),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+      );
+    },
+    child: Container(
+      width: double.infinity,
+      height: 100,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15.0),
+        color: appointment.color,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 24, right: 24, top: 10, bottom: 10),
+        child: Column(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  appointment.subject,
+                  style: AppStyles.textBold14.copyWith(color: AppColors.white),
+                ),
+              ),
+            ),
+            Expanded(
+                flex: 3,
+                child: Row(
+                    children: [
+                      SizedBox(
+                          width: 20,
+                          child: SvgPicture.asset('assets/icons/ic_clock.svg', height: 20, color: AppColors.white,)
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        '${DateFormat('HH:mm:ss').format(appointment.startTime)} - ${DateFormat('HH:mm:ss').format(appointment.endTime)}',
+                        style: AppStyles.textRegular14.copyWith(color: AppColors.white),
+                      ),
+                    ]
+                )
+            ),
+            Expanded(
+              flex: 2,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  appointment.notes,
+                  style: AppStyles.textRegular14.copyWith(color: AppColors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 List<Appointment> getAppointment(BuildContext context) {
@@ -1075,12 +1273,16 @@ List<Appointment> getAppointment(BuildContext context) {
   final eventDataSingleton = Provider.of<EventDataSingleton>(context);
   for (var i = 0; i < eventDataSingleton.getEvents.length; ++i) {
     final event = eventDataSingleton.getEvents[i];
+    final eventId = event.taskId;
     final startTime = DateTime.parse(event.taskStartTime);
     final endTime = DateTime.parse(event.taskEndTime);
     final subject = 'Khu vực ${event.area} - ${event.taskName}';
     final notes = 'Đạm: ${event.flow1}kg; Lân: ${event.flow2}kg; Kali: ${event.flow3}kg';
     final color = event.color;
     final appointment = Appointment(
+      id: eventId,
+      startTimeZone: 'SE Asia Standard Time',
+      endTimeZone: 'SE Asia Standard Time',
       startTime: startTime,
       endTime: endTime,
       subject: subject,

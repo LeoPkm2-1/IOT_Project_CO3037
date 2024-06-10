@@ -34,4 +34,19 @@ class AppColors {
   static const eventColor10 = Color(0xFF8E24AA);
   static const eventColor11 = Color(0xFF616161);
   static const eventColor12 = Color(0xFF009688);
+
+  static const eventColorLists = [
+    eventColor1,
+    eventColor2,
+    eventColor3,
+    eventColor4,
+    eventColor5,
+    eventColor6,
+    eventColor7,
+    eventColor8,
+    eventColor9,
+    eventColor10,
+    eventColor11,
+    eventColor12,
+  ];
 }

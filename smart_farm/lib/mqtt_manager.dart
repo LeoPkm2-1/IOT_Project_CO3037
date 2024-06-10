@@ -1,8 +1,16 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:flutter/foundation.dart';
+import 'package:smart_farm/main.dart';
+import 'package:smart_farm/values/app_styles.dart';
 import 'consts.dart';
 import 'dart:convert';
+import 'package:smart_farm/data.dart';
+import 'data_struct.dart';
+import 'values/app_colors.dart';
 
 
 class MqttManager {
@@ -143,6 +151,7 @@ class CounterScheduleIdInstance {
 
 class MqttInstance extends ChangeNotifier {
   late MqttManager myMqtt;
+  late Function(bool, String?) _onAddScheduleResult;
 
   List<String> _fiveLastMessages = [];
 
@@ -181,7 +190,10 @@ class MqttInstance extends ChangeNotifier {
       double flow1,
       double flow2,
       double flow3,
-      int area) {
+      int area,
+      Function(bool, String?) onResult
+      ) {
+
     final commandId = CounterIdInstance().counterId.toString();
     CounterIdInstance().increment();
 
@@ -193,7 +205,7 @@ class MqttInstance extends ChangeNotifier {
         'scheduleName': scheduleName,
         'cycle': cycle.toString(),
         'scheduleStartTime': scheduleStartTime,
-        'scheduleEndTime': scheduleEndTime,
+        'scheduleEndTime': cycle == 0 ? '' : scheduleEndTime,
         'flow1': flow1.toString(),
         'flow2': flow2.toString(),
         'flow3': flow3.toString(),
@@ -203,6 +215,8 @@ class MqttInstance extends ChangeNotifier {
 
     final message = jsonEncode(command);
     publish(message);
+
+    _onAddScheduleResult = onResult;
 
     // Save the last 5 messages
     if (_fiveLastMessages.length >= 5) {
@@ -257,10 +271,167 @@ class MqttInstance extends ChangeNotifier {
 
   void mqttOnMessage(String topic, String message) {
     print('Received message from $topic: $message');
+
+    // Message return in a JSON format
+    final Map<String, dynamic> data = jsonDecode(message);
+    // Might be there no status key
+    final String status = data.containsKey('status') ? data['status'] : 'NO_STATUS';
+    final String command = data['command'];
+
+    if (command == 'ADD_SCHEDULE') {
+      if (status == 'NO_STATUS') {
+        print('Confirm successful: $message');
+      } else if (status == 'SUCCESS') {
+        // {
+        // "status": "SUCCESS",
+        // "commandId": "2",
+        // "command": "ADD_SCHEDULE",
+        // "message": "Insert schedule succesfully, the tasks id are",
+        // "payload": ["0_1_2024_06_10_22_42_52_252785", "1_1_2024_06_10_22_42_52_252785", "2_1_2024_06_10_22_42_52_252785", "3_1_2024_06_10_22_42_52_252785"]
+        // }
+        final List<String> taskIds = List<String>.from(data['payload'].map((item) => item.toString()));
+        print('-----SUCCESS: Insert schedule succesfully, the tasks id are');
+        for (var taskId in taskIds) {
+          print('-----Task ID: $taskId');
+          MqttInstance().mqttGetTask(taskId);
+        }
+
+        _onAddScheduleResult(true, null);
+
+      } else if (status == 'ERROR') {
+        // {
+        // "status": "ERROR",
+        // "commandId": "0",
+        // "command": "ADD_SCHEDULE",
+        // "message": "start time and end time not true",
+        // "payload": {
+        // "scheduleId": "0",
+        // "scheduleName": "Schde 0",
+        // "cycle": "2",
+        // "scheduleStartTime": "2024-06-10 23:00:00",
+        // "scheduleEndTime": "2024-06-10 23:00:00",
+        // "flow1": "2.0",
+        // "flow2": "2.0",
+        // "flow3": "3.0",
+        // "area": "2"
+        // }
+        // }
+
+
+        // {
+        //   "status": "ERROR",
+        //   "commandId": "5",
+        //   "command": "ADD_SCHEDULE",
+        //   "message": "Schedule conflict with following tasks",
+        //   "payload": ["0_0_2024_06_10_23_17_31_721889"]
+        // }
+        if (data['message'] == 'start time and end time not true') {
+          print('-----ERROR: Start time and end time not true');
+
+          _onAddScheduleResult(false, 'Thời gian bắt đầu và kết thúc không hợp lệ');
+        } else if (data['message'] == 'Schedule conflict with following tasks') {
+          print('-----ERROR: Schedule conflict with following tasks');
+
+          final conflictTaskId = data['payload'][0];
+          // Get the task name and time in EventDataSingleton
+          final conflictTaskInfo = EventDataSingleton.instance.getEventBasicInfo(conflictTaskId);
+
+          _onAddScheduleResult(false, 'Trùng lịch $conflictTaskInfo');
+        }
+
+        print('-----ERROR: ${data['message']}');
+      }
+    }
+
+    if (command == 'GET_TASK') {
+      if (status == 'NO_STATUS') {
+        //     {
+        //       "command": "GET_TASK",
+        //   "commandId": "2",
+        //   "payload": {
+        //   "taskId": "0_1_2024_06_10_23_05_37_049818"
+        // }
+        // }
+        print('Confirm successful: $message');
+      } else if (status == 'SUCCESS') {
+        // {
+        // "status": "SUCCESS",
+        // "commandId": "2",
+        // "command": "GET_TASK",
+        // "message": "get task success",
+        // "payload": {
+        // "taskId": "0_1_2024_06_10_23_05_37_049818",
+        // "scheduleId": "1",
+        // "scheduleName": "scjhkjasf dfsdjkddf",
+        // "cycle": 1,
+        // "flow1": 1.0,
+        // "flow2": 2.0,
+        // "flow3": 3.0,
+        // "area": 1,
+        // "startAt": "2024-06-11 07:00:00",
+        // "endAt": "2024-06-11 07:00:06",
+        // "presentStatus": "WAITING"
+        // }
+        // }
+
+        // Add event to EventDataSingleton
+        final taskId = data['payload']['taskId'];
+        final taskName = data['payload']['scheduleName'];
+        final taskStartTime = data['payload']['startAt'];
+        final taskEndTime = data['payload']['endAt'];
+        final flow1E = data['payload']['flow1'].toString();
+        final flow2E = data['payload']['flow2'].toString();
+        final flow3E = data['payload']['flow3'].toString();
+        final areaE = data['payload']['area'].toString();
+        // Random color from 0 to 11 (12 colors)
+        final color = AppColors.eventColorLists[taskId.hashCode % 12];
+
+        final event = EventStruct(taskId: taskId, taskName: taskName, taskStartTime: taskStartTime, taskEndTime: taskEndTime, flow1: flow1E, flow2: flow2E, flow3: flow3E, area: areaE, color: color);
+        EventDataSingleton.instance.addEvent(event);
+      }
+    }
+
+    if (command == 'REMOVE_TASK') {
+      if (status == 'NO_STATUS') {
+        print('Confirm successful: $message');
+      } else if (status == 'SUCCESS') {
+        // {
+        //   "status": "SUCCESS",
+        //   "commandId": "5",
+        //   "command": "REMOVE_TASK",
+        //   "message": "delete complete task 2_0_2024_06_11_00_19_07_092053",
+        //   "payload": ""
+        // }
+        final taskId = data['message'].split(' ')[3];
+        EventDataSingleton.instance.removeEvent(taskId);
+        print('-----SUCCESS: Remove task success');
+
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text('Xóa lịch thành công', style: AppStyles.textRegular14.copyWith(color: AppColors.white)),
+            backgroundColor: AppColors.primaryGreen,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+      }
+    } else {
+      print('-----ERROR remove task');
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text('Xóa lịch thất bại', style: AppStyles.textRegular14.copyWith(color: AppColors.white)),
+          backgroundColor: AppColors.primaryGreen,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   MqttManager get mqtt => myMqtt;
 }
+
+
+
 
 
 

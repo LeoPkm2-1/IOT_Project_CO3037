@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:smart_farm/data.dart';
 import 'package:smart_farm/mqtt_manager.dart';
@@ -15,29 +17,27 @@ class AddSchedule extends StatefulWidget {
 }
 
 class _AddScheduleState extends State<AddSchedule> {
+  late Completer<bool> _addScheduleCompleter;
+
   final _formKey = GlobalKey<FormState>();
   String _title = '';
-  String _cycle = '0';
+  String _cycle = '';
   DateTime _startTime = DateTime.now();
   DateTime _endTime = DateTime.now();
-  String _flow1 = '0';
-  String _flow2 = '0';
-  String _flow3 = '0';
+  String _flow1 = '';
+  String _flow2 = '';
+  String _flow3 = '';
   Set<String> selectedArea = {'1'};
 
   void addSchedule() {
-    // Add new schedule to the list
-    // Save the list to SharedPreferences
+    _addScheduleCompleter = Completer<bool>();
+
     String scheduleId = CounterScheduleIdInstance().counterScheduleId.toString();
     CounterScheduleIdInstance().increment();
     final scheduleName = _title;
     final cycle = int.parse(_cycle);
     final scheduleStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_startTime);
-    // if cycle is 0, endtime is empty
-    String scheduleEndTime = "";
-    if (cycle != 0) {
-      scheduleEndTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_endTime);
-    }
+    final scheduleEndTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_endTime);
     final flow1 = double.parse(_flow1);
     final flow2 = double.parse(_flow2);
     final flow3 = double.parse(_flow3);
@@ -55,22 +55,58 @@ class _AddScheduleState extends State<AddSchedule> {
     print('area: $area');
     print('-----------------------------------------------');
 
-    MqttInstance().mqttAddSchedule(scheduleId, scheduleName, cycle, scheduleStartTime, scheduleEndTime, flow1, flow2, flow3, area);
+    MqttInstance().mqttAddSchedule(
+        scheduleId,
+        scheduleName,
+        cycle,
+        scheduleStartTime,
+        scheduleEndTime,
+        flow1,
+        flow2,
+        flow3,
+        area,
+        (bool isSuccess, String? message) {
+          Navigator.of(context).pop();
 
-    // Test event
-    final taskId = CounterIdInstance().counterId.toString();
-    CounterIdInstance().increment();
-    final taskName = scheduleName;
-    final taskStartTime = scheduleStartTime;
-    final taskEndTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_startTime.add(const Duration(hours: 2)));
-    final flow1E = flow1.toString();
-    final flow2E = flow2.toString();
-    final flow3E = flow3.toString();
-    final areaE = area.toString();
-    final color = AppColors.eventColor1;
+          if (isSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Thêm lịch thành công', style: AppStyles.textRegular14.copyWith(color: AppColors.white)),
+                backgroundColor: AppColors.primaryGreen,
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Thêm lịch không thành công: $message', style: AppStyles.textRegular14.copyWith(color: AppColors.white)),
+                backgroundColor: AppColors.primaryGreen,
+              ),
+            );
+          }
+        }
+    );
 
-    final event = EventStruct(taskId: taskId, taskName: taskName, taskStartTime: taskStartTime, taskEndTime: taskEndTime, flow1: flow1E, flow2: flow2E, flow3: flow3E, area: areaE, color: color);
-    EventDataSingleton.instance.addEvent(event);
+    // Wait for the response from the server
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              CircularProgressIndicator(color: AppColors.primaryGreen,),
+              SizedBox(height: 16),
+              Text('Đang xử lý'),
+            ],
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        );
+      },
+    );
   }
 
 
@@ -175,7 +211,7 @@ class _AddScheduleState extends State<AddSchedule> {
                                   textAlignVertical: TextAlignVertical.bottom,
                                   textAlign: TextAlign.center,
                                   decoration: InputDecoration(
-                                    hintText: '',
+                                    hintText: 'Nhap tieu de',
                                     hintStyle: AppStyles.textRegular14.copyWith(fontSize: 15),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(5.0),
@@ -449,11 +485,6 @@ class _AddScheduleState extends State<AddSchedule> {
                       // Add new schedule to the list
                       // Save the list to SharedPreferences
                       addSchedule();
-
-                      // Show a snackbar to notify the user
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Đang xử lý')),
-                      );
                     }
                   },
                   child: Text('Thêm lịch', style: AppStyles.textSemiBold14.copyWith(color: AppColors.white)),
