@@ -33,7 +33,11 @@ class _AddScheduleState extends State<AddSchedule> {
     final scheduleName = _title;
     final cycle = int.parse(_cycle);
     final scheduleStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_startTime);
-    final scheduleEndTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_endTime);
+    // if cycle is 0, endtime is empty
+    String scheduleEndTime = "";
+    if (cycle != 0) {
+      scheduleEndTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_endTime);
+    }
     final flow1 = double.parse(_flow1);
     final flow2 = double.parse(_flow2);
     final flow3 = double.parse(_flow3);
