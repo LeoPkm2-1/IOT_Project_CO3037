@@ -6,3 +6,4 @@ iot-co3037*.json
 *.vscode
 *\__pycache__
 *\test
+myenv
