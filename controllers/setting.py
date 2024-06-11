@@ -198,6 +198,7 @@ class Task (Schedule):
             "timeForMix2": self.get_time_for_mix2(),
             "timeForMix3": self.get_time_for_mix3(),
             "timeForSelectorAndPumpOut": self.get_time_pump_out(),
+            "area":self.get_area(),
         }
     
     def get_json_string_format(self):
