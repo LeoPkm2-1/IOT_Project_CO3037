@@ -1,28 +1,17 @@
-import 'dart:convert';
 import 'package:flutter/widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'data_struct.dart';
+import 'main.dart';
 
 class EventDataSingleton extends ChangeNotifier {
-  List<EventStruct> _eventList = [];
+  final List<EventStruct> _eventList = [];
 
-  EventDataSingleton._privateConstructor() {
-    // _loadData();
-  }
+  EventDataSingleton._privateConstructor();
 
   static final EventDataSingleton _instance = EventDataSingleton._privateConstructor();
 
   static EventDataSingleton get instance => _instance;
 
   List<EventStruct> get getEvents => _eventList;
-
-  Future<void> _loadData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? data = prefs.getString('eventList');
-    if (data != null) {
-      _eventList = EventStruct.fromString(data);
-    }
-  }
 
   Future<void> addEvent(EventStruct event) async {
     int insertIndex = _eventList.indexWhere((existingEvent) => existingEvent.taskStartTime.compareTo(event.taskStartTime) > 0);
@@ -31,19 +20,13 @@ class EventDataSingleton extends ChangeNotifier {
     } else {
       _eventList.insert(insertIndex, event);
     }
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // String data = EventStruct.listToJson(_eventList);
-    // await prefs.setString('eventList', data);
 
     notifyListeners();
   }
 
   Future<void> removeEvent(String taskId) async {
-    print('Remove event: $taskId');
+    logger.i('Remove event: $taskId');
     _eventList.removeWhere((event) => event.taskId == taskId);
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // String data = EventStruct.listToJson(_eventList);
-    // await prefs.setString('eventList', data);
 
     notifyListeners();
   }
@@ -53,73 +36,39 @@ class EventDataSingleton extends ChangeNotifier {
     EventStruct event = _eventList.firstWhere((event) => event.taskId == taskId);
     return '${event.area} - ${event.taskName}: ${event.taskStartTime} - ${event.taskEndTime}';
   }
+
+  String getEventNameAndArea(String taskId) {
+    // Find the event with taskId and return its name and area
+    EventStruct event = _eventList.firstWhere((event) => event.taskId == taskId);
+    return '${event.taskName} tại KV${event.area}';
+  }
 }
 
-// List<EventStruct> testEvents = [
-//   EventStruct(
-//     taskId: '1001',
-//     taskName: 'Tưới sáng định kỳ 1',
-//     taskStartTime: '2024-05-30 7:30:00',
-//     taskEndTime: '2024-05-30 7:55:00',
-//     flow1: '11',
-//     flow2: '22',
-//     flow3: '35',
-//     area: '1',
-//     color: AppColors.eventColor1,
-//   ),
-//   EventStruct(
-//     taskId: '1002',
-//     taskName: 'Tưới sáng định kỳ 2',
-//     taskStartTime: '2024-05-30 7:30:00',
-//     taskEndTime: '2024-05-30 7:55:00',
-//     flow1: '11',
-//     flow2: '22',
-//     flow3: '35',
-//     area: '1',
-//     color: AppColors.eventColor2,
-//   ),
-//   EventStruct(
-//     taskId: '1003',
-//     taskName: 'Tưới sáng định kỳ 3',
-//     taskStartTime: '2024-05-30 7:30:00',
-//     taskEndTime: '2024-05-30 7:55:00',
-//     flow1: '11',
-//     flow2: '22',
-//     flow3: '35',
-//     area: '1',
-//     color: AppColors.eventColor3,
-//   ),
-//   EventStruct(
-//     taskId: '1004',
-//     taskName: 'Tưới sáng định kỳ 4',
-//     taskStartTime: '2024-05-30 7:30:00',
-//     taskEndTime: '2024-05-30 7:55:00',
-//     flow1: '11',
-//     flow2: '22',
-//     flow3: '35',
-//     area: '1',
-//     color: AppColors.eventColor4,
-//   ),
-//   EventStruct(
-//     taskId: '1005',
-//     taskName: 'Tưới sáng định kỳ 5',
-//     taskStartTime: '2024-05-30 7:30:00',
-//     taskEndTime: '2024-05-30 7:55:00',
-//     flow1: '11',
-//     flow2: '22',
-//     flow3: '35',
-//     area: '1',
-//     color: AppColors.eventColor5,
-//   ),
-//   EventStruct(
-//     taskId: '1006',
-//     taskName: 'Tưới sáng định kỳ 6',
-//     taskStartTime: '2024-05-30 7:30:00',
-//     taskEndTime: '2024-05-30 7:55:00',
-//     flow1: '11',
-//     flow2: '22',
-//     flow3: '35',
-//     area: '1',
-//     color: AppColors.eventColor6,
-//   ),
-// ];
+// Create a notification singleton to manage notifications, each noti is a string
+class NotificationsSingleton extends ChangeNotifier {
+  final List<NotiItem> _notifications = [];
+  int _unreadNoti = 0;
+
+  NotificationsSingleton._privateConstructor();
+
+  static final NotificationsSingleton _instance = NotificationsSingleton._privateConstructor();
+
+  static NotificationsSingleton get instance => _instance;
+
+  List<NotiItem> get getNotifications => _notifications;
+  int get getUnreadNoti => _unreadNoti;
+
+  Future<void> addNotification(String noti) async {
+    _notifications.add(NotiItem(message: noti, isRead: false));
+    _unreadNoti++;
+    notifyListeners();
+  }
+
+  void markedAsReadAll() {
+    _unreadNoti = 0;
+    for (var noti in _notifications) {
+      noti.isRead = true;
+    }
+    notifyListeners();
+  }
+}

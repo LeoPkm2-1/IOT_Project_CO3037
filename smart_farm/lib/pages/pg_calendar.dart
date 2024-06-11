@@ -17,9 +17,7 @@ class _AppPageCalendarState extends State<AppPageCalendar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: "Lịch tưới"),
-      body: Container(
-        child: CalendarWidget(),
-      ),
+      body: const CalendarWidget(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -27,8 +25,8 @@ class _AppPageCalendarState extends State<AppPageCalendar> {
             MaterialPageRoute(builder: (context) => const AddSchedule()),
           );
         },
-        child: AppIcons.icPlus,
         backgroundColor: AppColors.primaryGreen,
+        child: AppIcons.icPlus,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );

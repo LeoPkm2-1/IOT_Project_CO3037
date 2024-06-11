@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smart_farm/consts.dart';
 import 'package:smart_farm/mqtt_manager.dart';
+import 'package:smart_farm/pages/pg_noti.dart';
 import 'package:smart_farm/values/app_colors.dart';
 import 'package:smart_farm/values/app_styles.dart';
 import 'package:smart_farm/values/app_assets.dart';
@@ -11,9 +13,10 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'dart:math';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-import 'package:smart_farm/data_struct.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_farm/data.dart';
+import 'package:smart_farm/pages/pg_calendar_add_schedule.dart';
+import 'package:smart_farm/main.dart';
 
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -50,25 +53,55 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       backgroundColor: AppColors.lightGrey,
       leading: IconButton(
-          onPressed: () {
-            // do nothing
-          },
-          icon: AppIcons.icMenu
+        // create an exit button
+        icon: AppIcons.icExit,
+        onPressed: () {
+          SystemNavigator.pop();
+        },
       ),
-      actions: [
-        IconButton(
-            onPressed: () {
-              // do nothing
-            },
-            icon: AppIcons.icNoti
+      actions: <Widget>[
+        Stack(
+          children: <Widget>[
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AppPageNoti()),
+                );
+              },
+              icon: AppIcons.icNoti
+            ),
+            Positioned(
+              right: 8,
+              top: 8,
+              child: Container(
+                padding: const EdgeInsets.all(1),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                constraints: const BoxConstraints(
+                  minWidth: 12,
+                  minHeight: 12,
+                ),
+                child: Consumer<NotificationsSingleton>(
+                  builder: (context, notificationsSingleton, child) => Text(
+                    notificationsSingleton.getUnreadNoti.toString(),
+                    style: AppStyles.textRegular14.copyWith(color: AppColors.white, fontSize: 8),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            )
+          ],
         ),
       ],
       toolbarHeight: 78,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1.0),
         child: Container(
-          color: AppColors.strokeColor,
-          height: 1.0,
+          color: AppColors.grey,
+          height: 2.0,
         ),
       )
     );
@@ -166,10 +199,10 @@ class _WeatherWidgetState extends State<WeatherWidget> {
   void _fetchWeather() async {
     Position position = await _getCurrentLocation();
 
-    print('=========================Fetch weather=========================');
-    print('Latitude: ${position.latitude}');
+    logger.i('=========================Fetch weather=========================');
+    logger.i('Latitude: ${position.latitude}');
     _wf.currentWeatherByLocation(position.latitude, position.longitude).then((weather) {
-      print(weather);
+      logger.i(weather);
       setState(() {
         _weather = weather;
       });
@@ -186,7 +219,7 @@ class _WeatherWidgetState extends State<WeatherWidget> {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20.0),
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         height: 150,
         child: Padding(
@@ -195,152 +228,140 @@ class _WeatherWidgetState extends State<WeatherWidget> {
             children: [
               Expanded(
                 flex: 50,
-                child: Container(
-                  child: Column(
-                    children: [
-                      Expanded(
-                        flex: 24,
-                        child: Container(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                flex:1,
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    DateFormat.yMMMMEEEEd().format(DateTime.now()),
-                                    style: AppStyles.textRegular14.copyWith(color: AppColors.black, fontSize: 15),
-                                  ),
-                                ),
+                child: Column(
+                  children: [
+                    Expanded(
+                      flex: 24,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex:1,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                DateFormat.yMMMMEEEEd().format(DateTime.now()),
+                                style: AppStyles.textRegular14.copyWith(color: AppColors.black, fontSize: 15),
                               ),
-                              Expanded(
-                                flex:1,
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                    _weather?.areaName ?? "null",
-                                    style: AppStyles.textRegular14.copyWith(color: AppColors.black, fontSize: 15),
-                                  ),
-                                ),
-                              )
-                            ]
-                          )
-                        ),
-                      ),
-                      Expanded(
-                        flex: 36,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            _weather?.weatherDescription ?? "null",
-                            style: AppStyles.textBold14.copyWith(color: AppColors.black, fontSize: 26),
+                            ),
                           ),
+                          Expanded(
+                            flex:1,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                _weather?.areaName ?? "null",
+                                style: AppStyles.textRegular14.copyWith(color: AppColors.black, fontSize: 15),
+                              ),
+                            ),
+                          )
+                        ]
+                      ),
+                    ),
+                    Expanded(
+                      flex: 36,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          _weather?.weatherDescription ?? "null",
+                          style: AppStyles.textBold14.copyWith(color: AppColors.black, fontSize: 26),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               const Divider(color: Color(0xFFDDDDDD), height: 2),
               Expanded(
                 flex: 50,
-                child: Container(
-                  child: Row(
-                    children: [
-                      // Nhiet do
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                          child: Column(
-                            children: [
-                              Expanded(
-                                flex: 22,
-                                child: Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Text(
-                                    'Nhiệt độ',
-                                    style: AppStyles.textSemiBold14.copyWith(color: AppColors.black, fontSize: 15),
-                                  ),
-                                ),
+                child: Row(
+                  children: [
+                    // Nhiet do
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            flex: 22,
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Text(
+                                'Nhiệt độ',
+                                style: AppStyles.textSemiBold14.copyWith(color: AppColors.black, fontSize: 15),
                               ),
-                              Expanded(
-                                flex: 37,
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                      (_weather?.temperature?.celsius?.toStringAsFixed(1) ?? '?') + '°C',
-                                    style: AppStyles.textSemiBold14.copyWith(color: AppColors.black, fontSize: 26),
-                                  ),
-                                ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 37,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                  '${_weather?.temperature?.celsius?.toStringAsFixed(1) ?? '?'}°C',
+                                style: AppStyles.textSemiBold14.copyWith(color: AppColors.black, fontSize: 26),
                               ),
-                            ],
-                          )
-                        ),
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
 
-                      // Do am
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  flex: 22,
-                                  child: Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Text(
-                                      'Độ ẩm',
-                                      style: AppStyles.textSemiBold14.copyWith(color: AppColors.black, fontSize: 15),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 37,
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      (_weather?.humidity?.toStringAsFixed(1) ?? '?') + '%',
-                                      style: AppStyles.textSemiBold14.copyWith(color: AppColors.black, fontSize: 26),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                        ),
+                    // Do am
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            flex: 22,
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Text(
+                                'Độ ẩm',
+                                style: AppStyles.textSemiBold14.copyWith(color: AppColors.black, fontSize: 15),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 37,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                '${_weather?.humidity?.toStringAsFixed(1) ?? '?'}%',
+                                style: AppStyles.textSemiBold14.copyWith(color: AppColors.black, fontSize: 26),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
 
-                      // Gio
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  flex: 22,
-                                  child: Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Text(
-                                      'Gió',
-                                      style: AppStyles.textSemiBold14.copyWith(color: AppColors.black, fontSize: 15),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 37,
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      '${_weather?.windSpeed?.toStringAsFixed(1) ?? '?'} m/s',
-                                      style: AppStyles.textSemiBold14.copyWith(color: AppColors.black, fontSize: 26),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                        ),
+                    // Gio
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            flex: 22,
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Text(
+                                'Gió',
+                                style: AppStyles.textSemiBold14.copyWith(color: AppColors.black, fontSize: 15),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 37,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                '${_weather?.windSpeed?.toStringAsFixed(1) ?? '?'} m/s',
+                                style: AppStyles.textSemiBold14.copyWith(color: AppColors.black, fontSize: 26),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ]
-                  ),
+                    ),
+                  ]
                 ),
               )
             ],
@@ -381,8 +402,8 @@ class QuickAccessButton extends StatelessWidget {
     required this.icon,
     required this.onTap,
     required this.label,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -432,11 +453,11 @@ class QuickAccessButton extends StatelessWidget {
 }
 
 class QuickAccess extends StatelessWidget {
-  const QuickAccess({Key? key}) : super(key: key);
+  const QuickAccess({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 80,
       child: Row(
@@ -444,25 +465,30 @@ class QuickAccess extends StatelessWidget {
           QuickAccessButton(
             color: AppColors.lightGreen,
             icon: AppIcons.icPlus,
-            onTap: () => print("=======On Tap Tao Lich Tuoi========="),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddSchedule()),
+              );
+            },
             label: 'Tạo lịch tưới',
           ),
-          QuickAccessButton(
-            color: AppColors.lightBlue,
-            icon: AppIcons.icGlassWater,
-            onTap: () => print("=======On Tap Them Phan========="),
-            label: 'Thêm phân',
-          ),
+          // QuickAccessButton(
+          //   color: AppColors.lightBlue,
+          //   icon: AppIcons.icGlassWater,
+          //   onTap: () => print("=======On Tap Them Phan========="),
+          //   label: 'Thêm phân',
+          // ),
           QuickAccessButton(
             color: AppColors.lightRed,
             icon: AppIcons.icWrench,
-            onTap: () => print("=======On Tap Tuoi Thu Cong========="),
+            onTap: () => logger.i("=======(On Tap) Tuoi Thu Cong========="),
             label: 'Tưới thủ công',
           ),
           QuickAccessButton(
             color: AppColors.lightYellow,
             icon: AppIcons.icLog,
-            onTap: () => print("=======On Tap Tao Lich Tuoi========="),
+            onTap: () => logger.i("=======(On Tap) Tao Lich Tuoi========="),
             label: 'Lịch sử tưới',
           ),
         ],
@@ -485,7 +511,7 @@ class _ScheduledEventState extends State<ScheduledEvent> {
   Widget build(BuildContext context) {
     final eventDataSingleton = Provider.of<EventDataSingleton>(context);
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: Column(
         children: [
@@ -493,28 +519,26 @@ class _ScheduledEventState extends State<ScheduledEvent> {
             'LỊCH TƯỚI SẮP DIỄN RA',
             style: AppStyles.title2.copyWith(color: AppColors.primaryGreen),
           ),
-          Container(
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                for (var i = 0; i < min(_displayedEventCount, eventDataSingleton.getEvents.length); ++i)
-                  Column(
-                    children: [
-                      eventDataSingleton.getEvents[i].buildEventWidget(),
-                      const SizedBox(height: 10),
-                    ],
-                  ),
-                if (_displayedEventCount < eventDataSingleton.getEvents.length)
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _displayedEventCount += 2;
-                      });
-                    },
-                    child: Text('Xem thêm', style: AppStyles.textRegular14.copyWith(color: AppColors.black)),
-                  ),
-              ],
-            ),
+          Column(
+            children: [
+              const SizedBox(height: 10),
+              for (var i = 0; i < min(_displayedEventCount, eventDataSingleton.getEvents.length); ++i)
+                Column(
+                  children: [
+                    eventDataSingleton.getEvents[i].buildEventWidget(),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              if (_displayedEventCount < eventDataSingleton.getEvents.length)
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _displayedEventCount += 2;
+                    });
+                  },
+                  child: Text('Xem thêm', style: AppStyles.textRegular14.copyWith(color: AppColors.black)),
+                ),
+            ],
           )
         ],
       ),
@@ -532,137 +556,133 @@ class MixedTankInfor extends StatefulWidget {
 class _MixedTankInforState extends State<MixedTankInfor> {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 180,
       child: Row(
         children: [
           Expanded(
             flex: 137,
-            child: Container(
-              child: Column(
-                children: [
-                  Expanded(
-                    flex: 30,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        'ĐANG DIỄN RA',
-                        textAlign: TextAlign.center,
-                        style: AppStyles.title3.copyWith(color: AppColors.black, fontSize: 16),
-                      ),
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 30,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'ĐANG DIỄN RA',
+                      textAlign: TextAlign.center,
+                      style: AppStyles.title3.copyWith(color: AppColors.black, fontSize: 16),
                     ),
                   ),
-                  Expanded(
-                    flex: 100,
-                    child: Container(),
-                  )
-                ],
-              ),
+                ),
+                Expanded(
+                  flex: 100,
+                  child: Container(),
+                )
+              ],
             ),
           ),
           Expanded(
             flex: 203,
-            child: Container(
-              child: Column(
-                children: [
-                  Expanded(
-                    flex: 30,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        'THÔNG TIN THÙNG TRỘN',
-                        textAlign: TextAlign.center,
-                        style: AppStyles.title3.copyWith(color: AppColors.black, fontSize: 16),
-                      ),
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 30,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'THÔNG TIN THÙNG TRỘN',
+                      textAlign: TextAlign.center,
+                      style: AppStyles.title3.copyWith(color: AppColors.black, fontSize: 16),
                     ),
                   ),
-                  Expanded(
-                    flex: 100,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10.0, bottom: 10.0),
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(40.0),
-                            topRight: Radius.circular(40.0),
-                            bottomLeft: Radius.circular(10.0),
-                            bottomRight: Radius.circular(10.0),
-                          ),
-                          color: AppColors.primaryGreen,
+                ),
+                Expanded(
+                  flex: 100,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10.0, bottom: 10.0),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(40.0),
+                          topRight: Radius.circular(40.0),
+                          bottomLeft: Radius.circular(10.0),
+                          bottomRight: Radius.circular(10.0),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: Row(
+                        color: AppColors.primaryGreen,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 90,
+                                    child: Text('Lượng đạm:', textAlign: TextAlign.right, style: AppStyles.textRegular16.copyWith(color: AppColors.white)),
+                                  ),
+                                  Expanded(
+                                    flex: 80,
+                                    child: Text('8.0 kg', textAlign: TextAlign.center, style: AppStyles.textBold14.copyWith(fontSize: 16, color: AppColors.white)),
+                                  )
+                                ]
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Row(
                                   children: [
                                     Expanded(
                                       flex: 90,
-                                      child: Text('Lượng đạm:', textAlign: TextAlign.right, style: AppStyles.textRegular16.copyWith(color: AppColors.white)),
+                                      child: Text('Lượng lân:', textAlign: TextAlign.right, style: AppStyles.textRegular16.copyWith(color: AppColors.white)),
                                     ),
                                     Expanded(
                                       flex: 80,
-                                      child: Text('8.0 kg', textAlign: TextAlign.center, style: AppStyles.textBold14.copyWith(fontSize: 16, color: AppColors.white)),
+                                      child: Text('0.7 kg', textAlign: TextAlign.center, style: AppStyles.textBold14.copyWith(fontSize: 16, color: AppColors.white)),
                                     )
                                   ]
-                                ),
                               ),
-                              Expanded(
-                                flex: 1,
-                                child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 90,
-                                        child: Text('Lượng lân:', textAlign: TextAlign.right, style: AppStyles.textRegular16.copyWith(color: AppColors.white)),
-                                      ),
-                                      Expanded(
-                                        flex: 80,
-                                        child: Text('0.7 kg', textAlign: TextAlign.center, style: AppStyles.textBold14.copyWith(fontSize: 16, color: AppColors.white)),
-                                      )
-                                    ]
-                                ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 90,
+                                      child: Text('Lượng kali:', textAlign: TextAlign.right, style: AppStyles.textRegular16.copyWith(color: AppColors.white)),
+                                    ),
+                                    Expanded(
+                                      flex: 80,
+                                      child: Text('12.0 kg', textAlign: TextAlign.center, style: AppStyles.textBold14.copyWith(fontSize: 16, color: AppColors.white)),
+                                    )
+                                  ]
                               ),
-                              Expanded(
-                                flex: 1,
-                                child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 90,
-                                        child: Text('Lượng kali:', textAlign: TextAlign.right, style: AppStyles.textRegular16.copyWith(color: AppColors.white)),
-                                      ),
-                                      Expanded(
-                                        flex: 80,
-                                        child: Text('12.0 kg', textAlign: TextAlign.center, style: AppStyles.textBold14.copyWith(fontSize: 16, color: AppColors.white)),
-                                      )
-                                    ]
-                                ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 90,
+                                      child: Text('Lượng nước:', textAlign: TextAlign.right, style: AppStyles.textRegular16.copyWith(color: AppColors.white)),
+                                    ),
+                                    Expanded(
+                                      flex: 80,
+                                      child: Text('20.0 lít', textAlign: TextAlign.center, style: AppStyles.textBold14.copyWith(fontSize: 16, color: AppColors.white)),
+                                    )
+                                  ]
                               ),
-                              Expanded(
-                                flex: 1,
-                                child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 90,
-                                        child: Text('Lượng nước:', textAlign: TextAlign.right, style: AppStyles.textRegular16.copyWith(color: AppColors.white)),
-                                      ),
-                                      Expanded(
-                                        flex: 80,
-                                        child: Text('20.0 lít', textAlign: TextAlign.center, style: AppStyles.textBold14.copyWith(fontSize: 16, color: AppColors.white)),
-                                      )
-                                    ]
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                )
+              ],
             ),
           )
         ],
@@ -676,7 +696,7 @@ class ButtonCreator extends StatefulWidget {
   final bool value;
   final Function(bool) onChanged;
 
-  const ButtonCreator({
+  const ButtonCreator({super.key,
     required this.textShow,
     required this.value,
     required this.onChanged
@@ -689,50 +709,48 @@ class ButtonCreator extends StatefulWidget {
 class _ButtonCreatorState extends State<ButtonCreator> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Align(
-          alignment: Alignment.center,
-          child: Container(
-              width: 180,
-              height: 45,
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(10.0),
-                border: Border.all(color: AppColors.darkGrey, width: 3.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.black.withOpacity(0.25),
-                    spreadRadius: 0,
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 6, right: 0),
-                child: Row(
-                    children: [
-                      Expanded(
-                        flex: 6,
-                        child: Text(
-                          widget.textShow,
-                          style: AppStyles.textRegular14.copyWith(color: AppColors.black, fontSize: 15),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 5,
-                        child: Switch(
-                          value: widget.value,
-                          onChanged: widget.onChanged,
-                          activeTrackColor: AppColors.primaryGreen,
-                          activeColor: Colors.white,
-                        ),
-                      )
-                    ]
+    return Align(
+        alignment: Alignment.center,
+        child: Container(
+            width: 180,
+            height: 45,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(10.0),
+              border: Border.all(color: AppColors.darkGrey, width: 3.0),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withOpacity(0.25),
+                  spreadRadius: 0,
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
                 ),
-              )
-          )
-      ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 6, right: 0),
+              child: Row(
+                  children: [
+                    Expanded(
+                      flex: 6,
+                      child: Text(
+                        widget.textShow,
+                        style: AppStyles.textRegular14.copyWith(color: AppColors.black, fontSize: 15),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: Switch(
+                        value: widget.value,
+                        onChanged: widget.onChanged,
+                        activeTrackColor: AppColors.primaryGreen,
+                        activeColor: Colors.white,
+                      ),
+                    )
+                  ]
+              ),
+            )
+        )
     );
   }
 }
@@ -750,69 +768,67 @@ class CustomFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Align(
-        alignment: Alignment.center,
-        child: Container(
-          width: double.infinity,
-          height: 48,
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(color: AppColors.darkGrey, width: 2.0),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.black.withOpacity(0.25),
-                spreadRadius: 0,
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+    return Align(
+      alignment: Alignment.center,
+      child: Container(
+        width: double.infinity,
+        height: 48,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(10.0),
+          border: Border.all(color: AppColors.darkGrey, width: 2.0),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withOpacity(0.25),
+              spreadRadius: 0,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 6, right: 6),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: Text(
+                  label,
+                  style: AppStyles.textRegular14.copyWith(color: AppColors.black, fontSize: 15),
+                ),
               ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 6, right: 6),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    label,
-                    style: AppStyles.textRegular14.copyWith(color: AppColors.black, fontSize: 15),
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    style: AppStyles.textRegular14.copyWith(fontSize: 15),
+                    textAlignVertical: TextAlignVertical.bottom,
+                    textAlign: TextAlign.center,
+                    decoration: InputDecoration(
+                      hintText: '0',
+                      hintStyle: AppStyles.textRegular14.copyWith(fontSize: 15),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                    ),
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return null;
+                      }
+                      final double? number = double.tryParse(value);
+                      if (number == null || number < 0) {
+                        return 'Invalid';
+                      }
+                      return null;
+                    },
+                    onChanged: onChanged,
+                    initialValue: initialValue,
                   ),
                 ),
-                Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
-                    child: TextFormField(
-                      keyboardType: TextInputType.number,
-                      style: AppStyles.textRegular14.copyWith(fontSize: 15),
-                      textAlignVertical: TextAlignVertical.bottom,
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                        hintText: '0',
-                        hintStyle: AppStyles.textRegular14.copyWith(fontSize: 15),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                      ),
-                      validator: (String? value) {
-                        if (value == null || value.isEmpty) {
-                          return null;
-                        }
-                        final double? number = double.tryParse(value);
-                        if (number == null || number < 0) {
-                          return 'Invalid';
-                        }
-                        return null;
-                      },
-                      onChanged: onChanged,
-                      initialValue: initialValue,
-                    ),
-                  ),
-                )
-              ],
-            ),
+              )
+            ],
           ),
         ),
       ),
@@ -830,30 +846,31 @@ class ManualControl extends StatefulWidget {
 class _ManualControlState extends State<ManualControl> {
 
   final _formKey = GlobalKey<FormState>();
-  String _flow1 = '0';
-  String _flow2 = '0';
-  String _flow3 = '0';
+  String _flow1 = '';
+  String _flow2 = '';
+  String _flow3 = '';
 
   Set<String> selectedArea = {'1'};
 
   void _addEventNow() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      print('Flow 1: $_flow1');
-      print('Flow 2: $_flow2');
-      print('Flow 3: $_flow3');
-      print('Area: $selectedArea');
+      logger.i('Flow 1: $_flow1');
+      logger.i('Flow 2: $_flow2');
+      logger.i('Flow 3: $_flow3');
+      logger.i('Area: $selectedArea');
 
       final scheduleId = CounterScheduleIdInstance().counterScheduleId.toString();
       CounterScheduleIdInstance().increment();
-      final scheduleName = 'Tuoi thu cong';
-      final cycle = 0;
-      final scheduleStartTime = "NOW";
-      final scheduleEndTime = "NOW";
-      final flow1 = double.parse(_flow1);
-      final flow2 = double.parse(_flow2);
-      final flow3 = double.parse(_flow3);
+      const scheduleName = 'Tuoi thu cong';
+      const cycle = 0;
+      const scheduleStartTime = "NOW";
+      const scheduleEndTime = "NOW";
+      final flow1 = _flow1 == '' ? 0.0 : double.parse(_flow1);
+      final flow2 = _flow2 == '' ? 0.0 : double.parse(_flow2);
+      final flow3 = _flow3 == '' ? 0.0 : double.parse(_flow3);
       final area = int.parse(selectedArea.first);
+
       MqttInstance().mqttAddSchedule(
           scheduleId,
           scheduleName,
@@ -864,7 +881,47 @@ class _ManualControlState extends State<ManualControl> {
           flow2,
           flow3,
           area,
-          (bool isSuccess, String? message) {}
+          (bool isSuccess, String? message) {
+            Navigator.of(context).pop();
+
+            if (isSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Tưới thủ công thành công', style: AppStyles.textRegular14.copyWith(color: AppColors.white)),
+                  backgroundColor: AppColors.primaryGreen,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Tưới thủ công không thành công: $message', style: AppStyles.textRegular14.copyWith(color: AppColors.white)),
+                  backgroundColor: AppColors.primaryGreen,
+                ),
+              );
+            }
+          }
+      );
+
+      // Wait for the response from the server
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: const Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                CircularProgressIndicator(color: AppColors.primaryGreen,),
+                SizedBox(height: 16),
+                Text('Đang xử lý'),
+              ],
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          );
+        },
       );
     }
   }
@@ -872,7 +929,7 @@ class _ManualControlState extends State<ManualControl> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: Column(
         children: [
@@ -880,7 +937,7 @@ class _ManualControlState extends State<ManualControl> {
             'ĐIỀU KHIỂN THỦ CÔNG',
             style: AppStyles.title2.copyWith(color: AppColors.primaryGreen),
           ),
-          Container(
+          SizedBox(
             height: 164,
             child: Row(
               children: [
@@ -890,41 +947,39 @@ class _ManualControlState extends State<ManualControl> {
                     padding: const EdgeInsets.only(right: 5.0),
                     child: Form(
                       key: _formKey,
-                      child: Container(
-                        child: Column(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: CustomFormField(
-                                label: '1. Đạm (kg)',
-                                initialValue: _flow1,
-                                onChanged: (String value) {
-                                  _flow1 = value == '' ? '0' : value;
-                                },
-                              ),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: CustomFormField(
+                              label: '1. Đạm (kg)',
+                              initialValue: _flow1,
+                              onChanged: (String value) {
+                                _flow1 = value == '' ? '0' : value;
+                              },
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: CustomFormField(
-                                label: '2. Lân (kg)',
-                                initialValue: _flow2,
-                                onChanged: (String value) {
-                                  _flow2 = value == '' ? '0' : value;
-                                },
-                              ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: CustomFormField(
+                              label: '2. Lân (kg)',
+                              initialValue: _flow2,
+                              onChanged: (String value) {
+                                _flow2 = value == '' ? '0' : value;
+                              },
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: CustomFormField(
-                                label: '3. Kali (kg)',
-                                initialValue: _flow3,
-                                onChanged: (String value) {
-                                  _flow3 = value == '' ? '0' : value;
-                                },
-                              ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: CustomFormField(
+                              label: '3. Kali (kg)',
+                              initialValue: _flow3,
+                              onChanged: (String value) {
+                                _flow3 = value == '' ? '0' : value;
+                              },
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -935,95 +990,93 @@ class _ManualControlState extends State<ManualControl> {
                     children: [
                       Expanded(
                         flex: 2,
-                        child: Container(
-                            child: Align(
-                                alignment: Alignment.center,
-                                child: Container(
-                                    height: 102,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.white,
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      border: Border.all(color: AppColors.darkGrey, width: 2.0),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: AppColors.black.withOpacity(0.25),
-                                          spreadRadius: 0,
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
+                        child: Align(
+                            alignment: Alignment.center,
+                            child: Container(
+                                height: 102,
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  border: Border.all(color: AppColors.darkGrey, width: 2.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.black.withOpacity(0.25),
+                                      spreadRadius: 0,
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
                                     ),
-                                    child: Column(
-                                        children: [
-                                          Expanded(
-                                            flex: 2,
-                                            child: Align(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                '4. Khu vực tưới',
-                                                style: AppStyles.textRegular14.copyWith(color: AppColors.black, fontSize: 15),
-                                              ),
-                                            ),
+                                  ],
+                                ),
+                                child: Column(
+                                    children: [
+                                      Expanded(
+                                        flex: 2,
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            '4. Khu vực tưới',
+                                            style: AppStyles.textRegular14.copyWith(color: AppColors.black, fontSize: 15),
                                           ),
-                                          Expanded(
-                                            flex: 3,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(top: 0.0, left: 6.0, right: 6.0, bottom: 6.0),
-                                              child: SegmentedButton(
-                                                  showSelectedIcon: false,
-                                                  style: ButtonStyle(
-                                                    backgroundColor: WidgetStateColor.resolveWith((Set<WidgetState> states) {
-                                                      return states.contains(WidgetState.selected)
-                                                          ? AppColors.primaryGreen
-                                                          : AppColors.white;
-                                                    }),
-                                                    foregroundColor: WidgetStateColor.resolveWith((Set<WidgetState> states) {
-                                                      return states.contains(WidgetState.selected)
-                                                          ? AppColors.white
-                                                          : AppColors.black;
-                                                    }),
-                                                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                                                      RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(5.0),
-                                                      ),
-                                                    ),
-                                                    alignment: const Alignment(0, 0.3),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 3,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(top: 0.0, left: 6.0, right: 6.0, bottom: 6.0),
+                                          child: SegmentedButton(
+                                              showSelectedIcon: false,
+                                              style: ButtonStyle(
+                                                backgroundColor: WidgetStateColor.resolveWith((Set<WidgetState> states) {
+                                                  return states.contains(WidgetState.selected)
+                                                      ? AppColors.primaryGreen
+                                                      : AppColors.white;
+                                                }),
+                                                foregroundColor: WidgetStateColor.resolveWith((Set<WidgetState> states) {
+                                                  return states.contains(WidgetState.selected)
+                                                      ? AppColors.white
+                                                      : AppColors.black;
+                                                }),
+                                                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                                                  RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(5.0),
                                                   ),
-                                                  segments:
-                                                      const <ButtonSegment<String>>[
-                                                        ButtonSegment<String>(
-                                                          value: '1',
-                                                          label: Text('1', style: AppStyles.textBold14),
-                                                        ),
-                                                        ButtonSegment<String>(
-                                                          value: '2',
-                                                          label: Text('2'),
-                                                        ),
-                                                        ButtonSegment<String>(
-                                                          value: '3',
-                                                          label: Text('3'),
-                                                        ),
-                                                      ],
-                                                  selected: selectedArea,
-                                                  onSelectionChanged: (value) {
-                                                    setState(() {
-                                                      selectedArea = value;
-                                                    });
-                                                  }
+                                                ),
+                                                alignment: const Alignment(0, 0.3),
                                               ),
-                                            ),
+                                              segments:
+                                                  const <ButtonSegment<String>>[
+                                                    ButtonSegment<String>(
+                                                      value: '1',
+                                                      label: Text('1', style: AppStyles.textBold14),
+                                                    ),
+                                                    ButtonSegment<String>(
+                                                      value: '2',
+                                                      label: Text('2'),
+                                                    ),
+                                                    ButtonSegment<String>(
+                                                      value: '3',
+                                                      label: Text('3'),
+                                                    ),
+                                                  ],
+                                              selected: selectedArea,
+                                              onSelectionChanged: (value) {
+                                                setState(() {
+                                                  selectedArea = value;
+                                                });
+                                              }
                                           ),
-                                        ]
-                                    )
+                                        ),
+                                      ),
+                                    ]
                                 )
-                            ),
-                          ),
+                            )
+                        ),
                       ),
                       Expanded(
                         flex: 1,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                          child: Container(
+                          child: SizedBox(
                             width: 110,
                             height: 20,
                             child: ElevatedButton(
@@ -1054,7 +1107,6 @@ class _ManualControlState extends State<ManualControl> {
   }
 }
 
-
 class CalendarWidget extends StatefulWidget {
   const CalendarWidget({super.key});
 
@@ -1065,52 +1117,50 @@ class CalendarWidget extends StatefulWidget {
 class _CalendarWidgetState extends State<CalendarWidget> {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: double.infinity,
       width: double.infinity,
-      child: Container(
-        child: SfCalendar(
-          view: CalendarView.schedule,
-          showTodayButton: true,
-          allowViewNavigation: true,
-          allowedViews: const <CalendarView>[
-            CalendarView.schedule,
-            CalendarView.day,
-            CalendarView.week,
-            CalendarView.month,
-          ],
-          headerDateFormat: 'MM/yyyy',
-          headerStyle: CalendarHeaderStyle(
-            textAlign: TextAlign.left,
-            backgroundColor: AppColors.white,
-            textStyle: AppStyles.textBold14.copyWith(color: AppColors.black),
-          ),
-
-          scheduleViewSettings: ScheduleViewSettings(
-            appointmentItemHeight: 90,
-            hideEmptyScheduleWeek: false,
-            weekHeaderSettings: WeekHeaderSettings(
-              startDateFormat: 'Tuần dd/MM',
-              endDateFormat: ' dd/MM',
-              height: 30,
-              backgroundColor: AppColors.grey,
-              textAlign: TextAlign.center,
-              weekTextStyle: AppStyles.textRegular14.copyWith(color: AppColors.black),
-            ),
-            monthHeaderSettings: MonthHeaderSettings(
-              height: 70,
-              monthFormat: 'MM/yyyy',
-              backgroundColor: AppColors.white,
-              textAlign: TextAlign.left,
-              monthTextStyle: AppStyles.textBold14.copyWith(fontSize: 20, color: AppColors.black),
-            ),
-          ),
-          firstDayOfWeek: 1,
-          todayHighlightColor: AppColors.primaryGreen,
-          dataSource: EventDataSource(getAppointment(context)),
-
-          appointmentBuilder: appointmentBuilder,
+      child: SfCalendar(
+        view: CalendarView.schedule,
+        showTodayButton: true,
+        allowViewNavigation: true,
+        allowedViews: const <CalendarView>[
+          CalendarView.schedule,
+          CalendarView.day,
+          CalendarView.week,
+          CalendarView.month,
+        ],
+        headerDateFormat: 'MM/yyyy',
+        headerStyle: CalendarHeaderStyle(
+          textAlign: TextAlign.left,
+          backgroundColor: AppColors.white,
+          textStyle: AppStyles.textBold14.copyWith(color: AppColors.black),
         ),
+
+        scheduleViewSettings: ScheduleViewSettings(
+          appointmentItemHeight: 90,
+          hideEmptyScheduleWeek: false,
+          weekHeaderSettings: WeekHeaderSettings(
+            startDateFormat: 'Tuần dd/MM',
+            endDateFormat: ' dd/MM',
+            height: 30,
+            backgroundColor: AppColors.grey,
+            textAlign: TextAlign.center,
+            weekTextStyle: AppStyles.textRegular14.copyWith(color: AppColors.black),
+          ),
+          monthHeaderSettings: MonthHeaderSettings(
+            height: 70,
+            monthFormat: 'MM/yyyy',
+            backgroundColor: AppColors.white,
+            textAlign: TextAlign.left,
+            monthTextStyle: AppStyles.textBold14.copyWith(fontSize: 20, color: AppColors.black),
+          ),
+        ),
+        firstDayOfWeek: 1,
+        todayHighlightColor: AppColors.primaryGreen,
+        dataSource: EventDataSource(getAppointment(context)),
+
+        appointmentBuilder: appointmentBuilder,
       ),
     );
   }
@@ -1141,31 +1191,31 @@ Widget appointmentBuilder(BuildContext context, CalendarAppointmentDetails calen
                   content: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Tên lịch:', style: AppStyles.textBold14),
+                      const Text('Tên lịch:', style: AppStyles.textBold14),
                       Align(
                         alignment: Alignment.centerRight,
                         child: Text('${appointment.subject.split(' - ')[1]}', style: AppStyles.textRegular14, textAlign: TextAlign.right)
                       ),
                       const SizedBox(height: 10),
-                      Text('Thời gian bắt đầu:', style: AppStyles.textBold14),
+                      const Text('Thời gian bắt đầu:', style: AppStyles.textBold14),
                       Align(
                           alignment: Alignment.centerRight,
-                          child: Text('${DateFormat('HH:mm:ss dd/MM/yyyy').format(appointment.startTime)}', style: AppStyles.textRegular14, textAlign: TextAlign.right)
+                          child: Text(DateFormat('HH:mm:ss dd/MM/yyyy').format(appointment.startTime), style: AppStyles.textRegular14, textAlign: TextAlign.right)
                       ),
                       const SizedBox(height: 10),
-                      Text('Thời gian kết thúc:', style: AppStyles.textBold14),
+                      const Text('Thời gian kết thúc:', style: AppStyles.textBold14),
                       Align(
                           alignment: Alignment.centerRight,
-                          child: Text('${DateFormat('HH:mm:ss dd/MM/yyyy').format(appointment.endTime)}', style: AppStyles.textRegular14, textAlign: TextAlign.right)
+                          child: Text(DateFormat('HH:mm:ss dd/MM/yyyy').format(appointment.endTime), style: AppStyles.textRegular14, textAlign: TextAlign.right)
                       ),
                       const SizedBox(height: 10),
-                      Text('Khu vực:', style: AppStyles.textBold14),
+                      const Text('Khu vực:', style: AppStyles.textBold14),
                       Align(
                           alignment: Alignment.centerRight,
                           child: Text('${appointment.subject.split(' - ')[0]}', style: AppStyles.textRegular14, textAlign: TextAlign.right)
                       ),
                       const SizedBox(height: 10),
-                      Text('Lượng tưới:', style: AppStyles.textBold14),
+                      const Text('Lượng tưới:', style: AppStyles.textBold14),
                       Align(
                           alignment: Alignment.centerRight,
                           child: Text('${appointment.notes}', style: AppStyles.textRegular14, textAlign: TextAlign.right)
@@ -1293,9 +1343,6 @@ List<Appointment> getAppointment(BuildContext context) {
   }
   return events;
 }
-
-// when tap on the Appointment, show the detail of the event
-
 
 class EventDataSource extends CalendarDataSource {
   EventDataSource(List<Appointment> source) {

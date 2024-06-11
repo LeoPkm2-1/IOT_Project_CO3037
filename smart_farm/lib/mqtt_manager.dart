@@ -1,9 +1,7 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
-import 'package:flutter/foundation.dart';
 import 'package:smart_farm/main.dart';
 import 'package:smart_farm/values/app_styles.dart';
 import 'consts.dart';
@@ -64,13 +62,13 @@ class MqttManager {
     try {
       await client!.connect();
     } catch (e) {
-      print('Exception: $e');
+      logger.i('Exception: $e');
       client!.disconnect();
     }
 
     // Check if we are connected
     if (client!.connectionStatus?.state == MqttConnectionState.connected) {
-      print('MQTT client connected');
+      logger.i('MQTT client connected');
 
       // Subscribe to the topics
       subscribeToTopics();
@@ -78,7 +76,7 @@ class MqttManager {
       // Set up a listener for incoming messages
       setupMessageListener();
     } else {
-      print('ERROR: MQTT client connection failed - '
+      logger.i('ERROR: MQTT client connection failed - '
           'disconnecting, state is ${client!.connectionStatus?.state}');
       client!.disconnect();
     }
@@ -98,11 +96,11 @@ class MqttManager {
     });
   }
 
-  static void onConnectedDefault() { print('Default Func: Connected'); }
-  static void onDisconnectedDefault() { print('Default Func: Disconnected'); }
-  static void onSubscribedDefault(String topic) { print('Default Func: Subscribed topic: $topic'); }
+  static void onConnectedDefault() { logger.i('Default Func: Connected'); }
+  static void onDisconnectedDefault() { logger.i('Default Func: Disconnected'); }
+  static void onSubscribedDefault(String topic) { logger.i('Default Func: Subscribed topic: $topic'); }
   static void messageReceivedDefault(String topic, String message) {
-    print('Default Func: Received message from $topic: $message');}
+    logger.i('Default Func: Received message from $topic: $message');}
 
   void publish(String topic, String message, bool retainval) {
     final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
@@ -153,8 +151,6 @@ class MqttInstance extends ChangeNotifier {
   late MqttManager myMqtt;
   late Function(bool, String?) _onAddScheduleResult;
 
-  List<String> _fiveLastMessages = [];
-
   MqttInstance._() {
     myMqtt = MqttManager(
       serverURI: 'io.adafruit.com',
@@ -162,9 +158,9 @@ class MqttInstance extends ChangeNotifier {
       password: ADAFRUIT_IO_PASSWORD,
       id: 'SmartFarmApp',
       feeds: [LISTEN_IOT_GATE, RESPONSE_IOT_GATE],
-      onConnectedCb: () => print('Connected to MQTT'),
-      onDisconnectedCb: () => print('Disconnected from MQTT'),
-      onSubscribedCb: (String topic) => print('Subscribed to $topic'),
+      onConnectedCb: () => logger.i('Connected to MQTT'),
+      onDisconnectedCb: () => logger.i('Disconnected from MQTT'),
+      onSubscribedCb: (String topic) => logger.i('Subscribed to $topic'),
       onMessageCb: mqttOnMessage,
     );
     myMqtt.connect();
@@ -177,7 +173,7 @@ class MqttInstance extends ChangeNotifier {
   factory MqttInstance() => _instance;
 
   void publish(String message) {
-    print('Publishing message: $message');
+    logger.i('Publishing message: $message');
     myMqtt.publish(LISTEN_IOT_GATE, message, true);
   }
 
@@ -217,12 +213,6 @@ class MqttInstance extends ChangeNotifier {
     publish(message);
 
     _onAddScheduleResult = onResult;
-
-    // Save the last 5 messages
-    if (_fiveLastMessages.length >= 5) {
-      _fiveLastMessages.removeAt(0);
-    }
-    _fiveLastMessages.add(message);
   }
 
   void mqttGetTask(String taskId) {
@@ -239,12 +229,6 @@ class MqttInstance extends ChangeNotifier {
 
     final message = jsonEncode(command);
     publish(message);
-
-    // Save the last 5 messages
-    if (_fiveLastMessages.length >= 5) {
-      _fiveLastMessages.removeAt(0);
-    }
-    _fiveLastMessages.add(message);
   }
 
   void mqttRemoveTask(String taskId) {
@@ -261,16 +245,10 @@ class MqttInstance extends ChangeNotifier {
 
     final message = jsonEncode(command);
     publish(message);
-
-    // Save the last 5 messages
-    if (_fiveLastMessages.length >= 5) {
-      _fiveLastMessages.removeAt(0);
-    }
-    _fiveLastMessages.add(message);
   }
 
   void mqttOnMessage(String topic, String message) {
-    print('Received message from $topic: $message');
+    logger.i('Received message from $topic: $message');
 
     // Message return in a JSON format
     final Map<String, dynamic> data = jsonDecode(message);
@@ -280,7 +258,7 @@ class MqttInstance extends ChangeNotifier {
 
     if (command == 'ADD_SCHEDULE') {
       if (status == 'NO_STATUS') {
-        print('Confirm successful: $message');
+        logger.i('Confirm successful: $message');
       } else if (status == 'SUCCESS') {
         // {
         // "status": "SUCCESS",
@@ -290,9 +268,9 @@ class MqttInstance extends ChangeNotifier {
         // "payload": ["0_1_2024_06_10_22_42_52_252785", "1_1_2024_06_10_22_42_52_252785", "2_1_2024_06_10_22_42_52_252785", "3_1_2024_06_10_22_42_52_252785"]
         // }
         final List<String> taskIds = List<String>.from(data['payload'].map((item) => item.toString()));
-        print('-----SUCCESS: Insert schedule succesfully, the tasks id are');
+        logger.i('-----SUCCESS: Insert schedule successfully, the tasks id are');
         for (var taskId in taskIds) {
-          print('-----Task ID: $taskId');
+          logger.i('-----Task ID: $taskId');
           MqttInstance().mqttGetTask(taskId);
         }
 
@@ -305,16 +283,16 @@ class MqttInstance extends ChangeNotifier {
         // "command": "ADD_SCHEDULE",
         // "message": "start time and end time not true",
         // "payload": {
-        // "scheduleId": "0",
-        // "scheduleName": "Schde 0",
-        // "cycle": "2",
-        // "scheduleStartTime": "2024-06-10 23:00:00",
-        // "scheduleEndTime": "2024-06-10 23:00:00",
-        // "flow1": "2.0",
-        // "flow2": "2.0",
-        // "flow3": "3.0",
-        // "area": "2"
-        // }
+        //   "scheduleId": "0",
+        //   "scheduleName": "Schde 0",
+        //   "cycle": "2",
+        //   "scheduleStartTime": "2024-06-10 23:00:00",
+        //   "scheduleEndTime": "2024-06-10 23:00:00",
+        //   "flow1": "2.0",
+        //   "flow2": "2.0",
+        //   "flow3": "3.0",
+        //   "area": "2"
+        //   }
         // }
 
 
@@ -326,11 +304,11 @@ class MqttInstance extends ChangeNotifier {
         //   "payload": ["0_0_2024_06_10_23_17_31_721889"]
         // }
         if (data['message'] == 'start time and end time not true') {
-          print('-----ERROR: Start time and end time not true');
+          logger.i('-----ERROR: Start time and end time not true');
 
           _onAddScheduleResult(false, 'Thời gian bắt đầu và kết thúc không hợp lệ');
         } else if (data['message'] == 'Schedule conflict with following tasks') {
-          print('-----ERROR: Schedule conflict with following tasks');
+          logger.i('-----ERROR: Schedule conflict with following tasks');
 
           final conflictTaskId = data['payload'][0];
           // Get the task name and time in EventDataSingleton
@@ -339,20 +317,20 @@ class MqttInstance extends ChangeNotifier {
           _onAddScheduleResult(false, 'Trùng lịch $conflictTaskInfo');
         }
 
-        print('-----ERROR: ${data['message']}');
+        logger.i('-----ERROR: ${data['message']}');
       }
     }
 
     if (command == 'GET_TASK') {
       if (status == 'NO_STATUS') {
-        //     {
-        //       "command": "GET_TASK",
-        //   "commandId": "2",
-        //   "payload": {
+        // {
+        // "command": "GET_TASK",
+        // "commandId": "2",
+        // "payload": {
         //   "taskId": "0_1_2024_06_10_23_05_37_049818"
+        //   }
         // }
-        // }
-        print('Confirm successful: $message');
+        logger.i('Confirm successful: $message');
       } else if (status == 'SUCCESS') {
         // {
         // "status": "SUCCESS",
@@ -360,18 +338,18 @@ class MqttInstance extends ChangeNotifier {
         // "command": "GET_TASK",
         // "message": "get task success",
         // "payload": {
-        // "taskId": "0_1_2024_06_10_23_05_37_049818",
-        // "scheduleId": "1",
-        // "scheduleName": "scjhkjasf dfsdjkddf",
-        // "cycle": 1,
-        // "flow1": 1.0,
-        // "flow2": 2.0,
-        // "flow3": 3.0,
-        // "area": 1,
-        // "startAt": "2024-06-11 07:00:00",
-        // "endAt": "2024-06-11 07:00:06",
-        // "presentStatus": "WAITING"
-        // }
+        //   "taskId": "0_1_2024_06_10_23_05_37_049818",
+        //   "scheduleId": "1",
+        //   "scheduleName": "scjhkjasf dfsdjkddf",
+        //   "cycle": 1,
+        //   "flow1": 1.0,
+        //   "flow2": 2.0,
+        //   "flow3": 3.0,
+        //   "area": 1,
+        //   "startAt": "2024-06-11 07:00:00",
+        //   "endAt": "2024-06-11 07:00:06",
+        //   "presentStatus": "WAITING"
+        //   }
         // }
 
         // Add event to EventDataSingleton
@@ -393,7 +371,7 @@ class MqttInstance extends ChangeNotifier {
 
     if (command == 'REMOVE_TASK') {
       if (status == 'NO_STATUS') {
-        print('Confirm successful: $message');
+        logger.i('Confirm successful: $message');
       } else if (status == 'SUCCESS') {
         // {
         //   "status": "SUCCESS",
@@ -404,26 +382,50 @@ class MqttInstance extends ChangeNotifier {
         // }
         final taskId = data['message'].split(' ')[3];
         EventDataSingleton.instance.removeEvent(taskId);
-        print('-----SUCCESS: Remove task success');
+        logger.i('-----SUCCESS: Remove task success');
 
         scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('Xóa lịch thành công', style: AppStyles.textRegular14.copyWith(color: AppColors.white)),
             backgroundColor: AppColors.primaryGreen,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
-
+      } else if (status == 'ERROR') {
+        // {
+        //   "status": "ERROR",
+        //   "commandId": "2",
+        //   "command": "REMOVE_TASK",
+        //   "message": "task with id 0_0_2024_06_11_10_15_50_363476 is running so not remove",
+        //   "payload": ""
+        // }
+        logger.i('-----ERROR remove task');
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text('Xóa lịch thất bại (lịch đã thực thi)', style: AppStyles.textRegular14.copyWith(color: AppColors.white)),
+            backgroundColor: AppColors.primaryGreen,
+            duration: const Duration(seconds: 2),
+          ),
+        );
       }
-    } else {
-      print('-----ERROR remove task');
-      scaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBar(
-          content: Text('Xóa lịch thất bại', style: AppStyles.textRegular14.copyWith(color: AppColors.white)),
-          backgroundColor: AppColors.primaryGreen,
-          duration: Duration(seconds: 2),
-        ),
-      );
+    }
+
+    if (command == 'TASK_RUNNING') {
+      // {
+      //   "status": "SUCCESS",
+      //   "commandId": "",
+      //   "command": "TASK_RUNNING",
+      //   "message": "Task with the following id is running",
+      //   "payload": "0_0_2024_06_11_10_15_50_363476"
+      // }
+      // noti in form "daytime# message" the datetime in form "HH:MM:SS DD/MM/YYYY"
+      // Message in form "Bắt đầu lịch: $taskName tại $area"
+      logger.i('-----TASK_RUNNING: Task with the following id is running');
+      final taskId = data['payload'];
+      final taskName = EventDataSingleton.instance.getEventNameAndArea(taskId);
+      String newNoti = '${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second} ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}#Bắt đầu lịch: $taskName';
+
+      NotificationsSingleton.instance.addNotification(newNoti);
     }
   }
 

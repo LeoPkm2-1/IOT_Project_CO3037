@@ -2,8 +2,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smart_farm/values/app_colors.dart';
 
 class AppImages {
-  static final String imagePath = 'assets/images/';
-  static final String img_hethong = '${imagePath}img_hethong.png';
+  static const String imagePath = 'assets/images/';
+  static const String img_hethong = '${imagePath}img_hethong.png';
+  static String get img_upload => '${imagePath}img_upload.png';
+}
+
+class AppAIModel {
+  static const String modelPath = 'assets/ai_model/';
+  static const String ai_labelPath = '${modelPath}labels.txt';
+  static const String ai_modelPath = '${modelPath}model_unquant.tflite';
 }
 
 class AppIcons {
@@ -24,4 +31,8 @@ class AppIcons {
   static final icPlus = SvgPicture.asset('assets/icons/ic_plus.svg', height: 26, color: AppColors.white);
   static final icWrench = SvgPicture.asset('assets/icons/ic_wrench.svg', height: 26, color: AppColors.white);
   static final icClock = SvgPicture.asset('assets/icons/ic_clock.svg', height: 20, color: AppColors.white);
+
+  static final icImage = SvgPicture.asset('assets/icons/ic_image_solid.svg', height: 26, color: AppColors.black);
+  static final icExit = SvgPicture.asset('assets/icons/ic_exit.svg', height: 26, color: AppColors.black);
+  static final icArrowLeft = SvgPicture.asset('assets/icons/ic_arrow_left.svg', height: 26, color: AppColors.black);
 }

@@ -199,6 +199,16 @@ class EventStruct {
   }
 }
 
+class NotiItem {
+  String message;
+  bool isRead;
+
+  NotiItem({
+    required this.message,
+    required this.isRead,
+  });
+}
+
 // task != schedule
 // submit schedule => success, receive a task_id[] => get_task + id
 // => save to local storage
