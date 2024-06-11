@@ -130,7 +130,7 @@ class Modbus485:
                 ser.write(serial.to_bytes(relay1_OFF))
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
-        time.sleep(0.1)
+        time.sleep(0.3)
         print(f'__data__: {self.serial_read_data()}')
 
 
@@ -143,7 +143,7 @@ class Modbus485:
                 ser.write(serial.to_bytes(relay2_OFF))
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
-        time.sleep(0.1)
+        time.sleep(0.3)
         print(f'__data__: {self.serial_read_data()}')
 
     def set_device_3(self,state):
@@ -155,7 +155,7 @@ class Modbus485:
                 ser.write(serial.to_bytes(relay3_OFF))
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
-        time.sleep(0.1)
+        time.sleep(0.3)
         print(f'__data__: {self.serial_read_data()}')
         
         
@@ -168,7 +168,7 @@ class Modbus485:
                 ser.write(serial.to_bytes(relay4_OFF))
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
-        time.sleep(0.1)
+        time.sleep(0.3)
         print(f'__data__: {self.serial_read_data()}')
         
         
@@ -181,7 +181,7 @@ class Modbus485:
                 ser.write(serial.to_bytes(relay5_OFF))
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
-        time.sleep(0.1)
+        time.sleep(0.3)
         print(f'__data__: {self.serial_read_data()}')
                 
         
@@ -194,7 +194,7 @@ class Modbus485:
                 ser.write(serial.to_bytes(relay6_OFF))
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
-        time.sleep(0.1)
+        time.sleep(0.3)
         print(f'__data__: {self.serial_read_data()}')
         
     def set_device_7(self,state):
@@ -206,7 +206,7 @@ class Modbus485:
                 ser.write(serial.to_bytes(relay7_OFF))
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
-        time.sleep(0.1)
+        time.sleep(0.3)
         print(f'__data__: {self.serial_read_data()}')
 
 
@@ -219,7 +219,7 @@ class Modbus485:
                 ser.write(serial.to_bytes(relay8_OFF))
         except Exception as e:
             print("Modbus485**","Failed to write data:",e)
-        time.sleep(0.1)
+        time.sleep(0.3)
         print(f'__data__: {self.serial_read_data()}')
 
 
@@ -264,8 +264,8 @@ if __name__ =='__main__':
     # SerialController.set_device_state(2,True)
     temp_data =[10, 3,2,0,11,92,66]
     SerialController.modbus485_send(temp_data)
-    time.sleep(0.1)
+    time.sleep(0.3)
     temp_data =[10, 3,2,20,187,82,246]
     SerialController.modbus485_send(temp_data)
-    time.sleep(0.1)
+    time.sleep(0.3)
     print('data:__',SerialController.serial_read_data())
