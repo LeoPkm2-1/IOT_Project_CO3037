@@ -20,7 +20,7 @@ pip install -r requirements.txt
 ```
 
 4. create **.env** file with following structure to store key:
-```json
+```console
 ADAFRUIT_IO_USERNAME= <adafruit_io_username>
 ADAFRUIT_IO_PASSWORD= <adafruit_io_password>
 LISTEN_IOT_GATE= <adafruit_io_feed_id_1>
@@ -28,6 +28,6 @@ RESPONSE_IOT_GATE=<adafruit_io_feed_id_2>
 ```
 
 5. To run project by the following command:
-```json
+```console
 python main.py
 ```
