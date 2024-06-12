@@ -190,27 +190,8 @@ class HandleEvent:
 
                             for task in LIST_OF_TASK:
                                 print(task.get_taskId())
-                            # def acb(thread_name,deylay1):
-                            #     print('\tRun mix 1')
-                            #     def mix2():
-                            #         print("\t\tend mix 1")
-                            #         return
-                            #     threading.Timer(deylay1,mix2).start()
-                            # def task_temp(thread_name,delay1,delay2):
-                            #     print('\t===RUN MIX 2')
-                            #     def mix():
-                            #         print('\t===END_M2')
-                            #         def func():
-                            #             print('\t===ahihi')
-                            #             return;
-                            #         threading.Timer(delay2,func).start()
-                            #     threading.Timer(delay1,mix).start()
-                            # def delete_task_by_name(thread_name,task_name):
-                            #     SCH_Delete_Task_Name(task_name)
-                            #     return
-                            # SCH_Add_Task(acb,'task_name_1',0,"thread_name_1",0)
-                            # SCH_Add_Task(task_temp,"task_name_2",0,'thread_name_2',2,2)
-                            # SCH_Add_Task(delete_task_by_name,'dell_ahihi',3,'thread_name_3',"task_name_1")
+                            
+                        
                     # xoá lịch
                     elif eventData['command'].upper() == 'GET_TASK':
                         taskIdQuery = eventData['payload']['taskId']

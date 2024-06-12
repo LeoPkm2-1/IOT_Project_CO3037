@@ -186,8 +186,6 @@ class Task (Schedule):
             "scheduleId": self.scheduleId,
             "scheduleName": self.scheduleName,
             "cycle": self.cycle,
-            # "scheduleStartTime": self.scheduleStartTime.strftime(self.DATE_TIME_FORMAT),
-            # "scheduleEndTime": self.scheduleEndTime,
             "flow1": self.flow1,
             "flow2": self.flow2,
             "flow3": self.flow3,
@@ -318,5 +316,3 @@ if __name__ == '__main__':
     b = a.get_list_of_tasks()
     for data in b:
         print(data,'\n')
-
-    # print('ahihi')
